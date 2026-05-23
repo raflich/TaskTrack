@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        session(['remember_me' => $request->boolean('remember')]);
+
         return redirect()->intended(route('kanban.index'));
     }
 

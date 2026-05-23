@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -47,5 +48,13 @@ class User extends Authenticatable
             return strtoupper($words[0][0] . $words[1][0]);
         }
         return strtoupper(substr($this->nama_user, 0, 2));
+    }
+
+    /**
+     * Send the password reset notification with a reset URL to the web page.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

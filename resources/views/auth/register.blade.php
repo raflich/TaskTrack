@@ -23,7 +23,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" onsubmit="sessionStorage.setItem('tab_session_active', 'true');">
             @csrf
 
             {{-- Nama --}}

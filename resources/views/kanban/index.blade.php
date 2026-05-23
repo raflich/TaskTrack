@@ -1,7 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="p-6 h-full flex flex-col">
+<style>
+.sortable-ghost {
+    opacity: 0.35 !important;
+    background-color: #faf5f0 !important;
+    border: 2px dashed #bfa38a !important;
+    box-shadow: none !important;
+}
+.sortable-drag {
+    opacity: 0.95 !important;
+    transform: rotate(2deg) scale(1.02) !important;
+    box-shadow: 0 25px 50px -12px rgba(74, 39, 15, 0.22) !important;
+    cursor: grabbing !important;
+}
+.sortable-fallback {
+    opacity: 0.95 !important;
+    transform: rotate(2deg) scale(1.02) !important;
+    box-shadow: 0 25px 50px -12px rgba(74, 39, 15, 0.22) !important;
+    cursor: grabbing !important;
+}
+</style>
+
+<div class="flex flex-col">
 
     {{-- Flash message --}}
     @if(session('success'))
@@ -11,18 +32,19 @@
     @endif
 
     {{-- KOLOM KANBAN --}}
-    <div class="flex gap-4 flex-1 overflow-x-auto pb-4">
+    <div class="flex gap-6 pb-6 items-start">
 
         {{-- TODO --}}
-        <div class="flex-1 min-w-[260px] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <h2 class="font-semibold text-gray-700">To Do</h2>
-                <span id="count-TODO" class="bg-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
+        <div class="flex-1 min-w-[280px] flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="font-bold text-[#4a270f] text-base">To Do</h2>
+                <span id="count-TODO" class="bg-[#eae0d5] text-[#8c7462] text-xs px-2.5 py-0.5 rounded-full font-bold">
                     {{ $todo->count() }}
                 </span>
             </div>
             <div id="col-TODO" data-status="TODO"
-                 class="kanban-col flex flex-col gap-3 flex-1 bg-[#f0e6dc] rounded-xl p-3 min-h-[200px]">
+                 class="kanban-col flex flex-col gap-4 flex-1 bg-[#fbf3e9] rounded-2xl p-4"
+                 style="min-height: 80px;">
                 @foreach($todo as $task)
                     @include('kanban.partials.card', ['task' => $task])
                 @endforeach
@@ -30,15 +52,16 @@
         </div>
 
         {{-- DOING --}}
-        <div class="flex-1 min-w-[260px] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <h2 class="font-semibold text-gray-700">Doing</h2>
-                <span id="count-DOING" class="bg-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
+        <div class="flex-1 min-w-[280px] flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="font-bold text-[#4a270f] text-base">Doing</h2>
+                <span id="count-DOING" class="bg-[#eae0d5] text-[#8c7462] text-xs px-2.5 py-0.5 rounded-full font-bold">
                     {{ $doing->count() }}
                 </span>
             </div>
             <div id="col-DOING" data-status="DOING"
-                 class="kanban-col flex flex-col gap-3 flex-1 bg-[#f0e6dc] rounded-xl p-3 min-h-[200px]">
+                 class="kanban-col flex flex-col gap-4 flex-1 bg-[#fbf3e9] rounded-2xl p-4"
+                 style="min-height: 80px;">
                 @foreach($doing as $task)
                     @include('kanban.partials.card', ['task' => $task])
                 @endforeach
@@ -46,15 +69,16 @@
         </div>
 
         {{-- DONE --}}
-        <div class="flex-1 min-w-[260px] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <h2 class="font-semibold text-gray-700">Done</h2>
-                <span id="count-DONE" class="bg-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
+        <div class="flex-1 min-w-[280px] flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="font-bold text-[#4a270f] text-base">Done</h2>
+                <span id="count-DONE" class="bg-[#eae0d5] text-[#8c7462] text-xs px-2.5 py-0.5 rounded-full font-bold">
                     {{ $done->count() }}
                 </span>
             </div>
             <div id="col-DONE" data-status="DONE"
-                 class="kanban-col flex flex-col gap-3 flex-1 bg-[#f0e6dc] rounded-xl p-3 min-h-[200px]">
+                 class="kanban-col flex flex-col gap-4 flex-1 bg-[#fbf3e9] rounded-2xl p-4"
+                 style="min-height: 80px;">
                 @foreach($done as $task)
                     @include('kanban.partials.card', ['task' => $task])
                 @endforeach
@@ -77,8 +101,6 @@
 {{-- ══════════════════════════════════════ --}}
 <div id="modalDelete" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center">
-
-        {{-- Icon trash --}}
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor">
@@ -87,14 +109,11 @@
                          L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
         </div>
-
         <h2 class="text-lg font-bold text-gray-800 mb-2">Delete Task?</h2>
         <p class="text-sm text-gray-400 mb-6">
             Are you sure you want to delete this task?<br/>
             This action will move it to the Trash.
         </p>
-
-        {{-- Form delete --}}
         <form id="deleteForm" method="POST" action="">
             @csrf
             @method('DELETE')
@@ -104,12 +123,10 @@
                 Move to Trash
             </button>
         </form>
-
         <button onclick="closeDeleteModal()"
                 class="text-sm text-gray-400 hover:text-gray-600 transition">
             Cancel
         </button>
-
     </div>
 </div>
 
@@ -119,10 +136,8 @@
 <div id="modalTambah" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-2xl p-8 w-full max-w-xl shadow-xl">
         <h2 class="text-xl font-bold text-gray-800 mb-6">Create New Task</h2>
-
         <form method="POST" action="{{ route('tasks.store') }}">
             @csrf
-
             <div class="mb-4">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Task Title</label>
                 <input type="text" name="judul_task"
@@ -130,7 +145,6 @@
                        class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
                        required/>
             </div>
-
             <div class="flex gap-4 mb-4">
                 <div class="flex-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
@@ -150,12 +164,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-4">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
                 <textarea name="deskripsi" rows="3" placeholder="Describe the core objectives of this task..." class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"></textarea>
             </div>
-
             <div class="mb-6">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Subtasks</label>
                 <div id="subtaskListCreate" class="flex flex-col gap-2 mt-2">
@@ -170,12 +182,9 @@
                     + Add Subtask
                 </button>
             </div>
-
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="closeCreateModal()"
-                        class="px-5 py-2 text-sm text-gray-500 hover:text-gray-700">
-                    Cancel
-                </button>
+                        class="px-5 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
                         class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg transition">
                     Create Task
@@ -191,18 +200,15 @@
 <div id="modalEdit" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-2xl p-8 w-full max-w-xl shadow-xl">
         <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Task</h2>
-
         <form id="editForm" method="POST" action="">
             @csrf
             @method('PUT')
-
             <div class="mb-4">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Task Title</label>
                 <input type="text" id="editJudul" name="judul_task"
                        class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
                        required/>
             </div>
-
             <div class="flex gap-4 mb-4">
                 <div class="flex-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
@@ -222,12 +228,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-4">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
                 <textarea id="editDeskripsi" name="deskripsi" rows="3" class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"></textarea>
             </div>
-
             <div class="mb-6">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Subtasks</label>
                 <div id="subtaskListEdit" class="flex flex-col gap-2 mt-2"></div>
@@ -236,12 +240,9 @@
                     + Add Subtask
                 </button>
             </div>
-
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="closeEditModal()"
-                        class="px-5 py-2 text-sm text-gray-500 hover:text-gray-700">
-                    Cancel
-                </button>
+                        class="px-5 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
                         class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg transition">
                     Save Changes
@@ -260,17 +261,12 @@ const tasksData = @json(array_merge(
 ));
 </script>
 
-{{-- SortableJS --}}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
 <script>
 // ══ MODAL CREATE ══
-function openCreateModal() {
-    document.getElementById('modalTambah').classList.remove('hidden');
-}
-function closeCreateModal() {
-    document.getElementById('modalTambah').classList.add('hidden');
-}
+function openCreateModal() { document.getElementById('modalTambah').classList.remove('hidden'); }
+function closeCreateModal() { document.getElementById('modalTambah').classList.add('hidden'); }
 function addSubtaskCreate() {
     const list = document.getElementById('subtaskListCreate');
     const div  = document.createElement('div');
@@ -285,43 +281,30 @@ function addSubtaskCreate() {
 
 // ══ MODAL DELETE ══
 function openDeleteModal(taskId) {
-    const url = `/tasks/${taskId}`;
-    document.getElementById('deleteForm').action = url;
+    document.getElementById('deleteForm').action = `/tasks/${taskId}`;
     document.getElementById('modalDelete').classList.remove('hidden');
 }
-function closeDeleteModal() {
-    document.getElementById('modalDelete').classList.add('hidden');
-}
+function closeDeleteModal() { document.getElementById('modalDelete').classList.add('hidden'); }
 
 // ══ MODAL EDIT ══
 function openEditModal(taskId) {
     const task = tasksData.find(t => t.id_task === taskId);
     if (!task) return;
-
-    document.getElementById('editForm').action = `/tasks/${taskId}`;
-    document.getElementById('editJudul').value    = task.judul_task;
-    document.getElementById('editDeadline').value = task.tanggal_deadline ?? '';
+    document.getElementById('editForm').action     = `/tasks/${taskId}`;
+    document.getElementById('editJudul').value     = task.judul_task;
+    document.getElementById('editDeadline').value  = task.tanggal_deadline ?? '';
     document.getElementById('editDeskripsi').value = task.deskripsi ?? '';
-
-    document.querySelectorAll('.edit-priority').forEach(radio => {
-        radio.checked = radio.value === task.prioritas;
-    });
-
+    document.querySelectorAll('.edit-priority').forEach(r => r.checked = r.value === task.prioritas);
     const subtaskList = document.getElementById('subtaskListEdit');
     subtaskList.innerHTML = '';
     if (task.subtasks && task.subtasks.length > 0) {
-        task.subtasks.forEach(sub => {
-            subtaskList.appendChild(makeSubtaskRow(sub.nama_subtask));
-        });
+        task.subtasks.forEach(sub => subtaskList.appendChild(makeSubtaskRow(sub.nama_subtask)));
     } else {
         subtaskList.appendChild(makeSubtaskRow(''));
     }
-
     document.getElementById('modalEdit').classList.remove('hidden');
 }
-function closeEditModal() {
-    document.getElementById('modalEdit').classList.add('hidden');
-}
+function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }
 function makeSubtaskRow(value = '') {
     const div = document.createElement('div');
     div.className = 'flex items-center gap-2';
@@ -332,26 +315,26 @@ function makeSubtaskRow(value = '') {
     `;
     return div;
 }
-function addSubtaskEdit() {
-    document.getElementById('subtaskListEdit').appendChild(makeSubtaskRow(''));
-}
+function addSubtaskEdit() { document.getElementById('subtaskListEdit').appendChild(makeSubtaskRow('')); }
 
 // ══ DRAG AND DROP ══
 document.querySelectorAll('.kanban-col').forEach(col => {
     Sortable.create(col, {
         group: 'kanban',
-        animation: 150,
-        ghostClass: 'opacity-40',
-        dragClass: 'shadow-2xl',
+        animation: 200,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        fallbackClass: 'sortable-fallback',
+        forceFallback: true,
+        fallbackOnBody: true,
+        swapThreshold: 0.65,
         onEnd: function (evt) {
             const taskId    = evt.item.dataset.taskId;
             const newStatus = evt.to.dataset.status;
             const oldStatus = evt.from.dataset.status;
-
             if (newStatus === oldStatus) return;
-
+            updateCardStyle(evt.item, newStatus);
             updateCount();
-
             fetch(`/tasks/${taskId}/move`, {
                 method: 'POST',
                 headers: {
@@ -362,32 +345,139 @@ document.querySelectorAll('.kanban-col').forEach(col => {
                 body: JSON.stringify({ status_task: newStatus }),
             })
             .then(res => {
-                if (!res.ok) {
-                    alert('Gagal memperbarui status.');
-                    location.reload();
+                if (!res.ok) { alert('Gagal memperbarui status.'); location.reload(); }
+                else {
+                    const task = tasksData.find(t => t.id_task === taskId);
+                    if (task) task.status_task = newStatus;
                 }
             })
-            .catch(() => {
-                alert('Terjadi kesalahan jaringan.');
-                location.reload();
-            });
+            .catch(() => { alert('Terjadi kesalahan jaringan.'); location.reload(); });
         }
     });
 });
+
+function updateCardStyle(cardEl, newStatus) {
+    // Border kiri (absolute element)
+    const statusBorder = cardEl.querySelector('.status-border');
+    const borderMap = { TODO: '#c026d3', DOING: '#1d4ed8', DONE: '#9ca3af' };
+    if (statusBorder) {
+        statusBorder.style.backgroundColor = borderMap[newStatus] ?? '#9ca3af';
+    }
+
+    // Opacity
+    cardEl.classList.toggle('opacity-60', newStatus === 'DONE');
+
+    // Title
+    const titleEl = cardEl.querySelector('.task-title');
+    if (titleEl) {
+        titleEl.style.color          = newStatus === 'DONE' ? '#9ca3af' : '#2d1e17';
+        titleEl.style.textDecoration = newStatus === 'DONE' ? 'line-through' : 'none';
+    }
+
+    // Desc
+    const descEl = cardEl.querySelector('.task-desc');
+    if (descEl) {
+        descEl.style.color          = newStatus === 'DONE' ? '#9ca3af' : '#7c6a5e';
+        descEl.style.textDecoration = newStatus === 'DONE' ? 'line-through' : 'none';
+    }
+
+    // Priority badge
+    const badge    = cardEl.querySelector('.task-priority-badge');
+    const priority = badge?.getAttribute('data-priority');
+    if (badge) {
+        const bgMap = {
+            DONE: { HIGH: '#fee2e2', MEDIUM: '#f3e8ff', LOW: '#ffedd5' },
+            ACTIVE: { HIGH: '#ff3b30', MEDIUM: '#a855f8', LOW: '#f97316' },
+        };
+        const colorMap = {
+            DONE: { HIGH: '#ef4444', MEDIUM: '#a855f8', LOW: '#ea580c' },
+        };
+        if (newStatus === 'DONE') {
+            badge.style.background = bgMap.DONE[priority] ?? '#ffedd5';
+            badge.style.color      = colorMap.DONE[priority] ?? '#ea580c';
+        } else {
+            badge.style.background = bgMap.ACTIVE[priority] ?? '#f97316';
+            badge.style.color      = '#ffffff';
+        }
+    }
+
+    // Completed / date badge
+    const completedBadge = cardEl.querySelector('.completed-badge');
+    const dateBadge      = cardEl.querySelector('.date-badge');
+    if (completedBadge) completedBadge.style.display = newStatus === 'DONE' ? 'flex' : 'none';
+    if (dateBadge)      dateBadge.style.display = newStatus === 'DONE' ? 'none' : 'flex';
+}
 
 function updateCount() {
     ['TODO', 'DOING', 'DONE'].forEach(status => {
         const col   = document.getElementById(`col-${status}`);
         const badge = document.getElementById(`count-${status}`);
-        badge.textContent = col.querySelectorAll('[data-task-id]').length;
+        if (col && badge) badge.textContent = col.querySelectorAll('[data-task-id]').length;
     });
 }
 
-// ══ TUTUP MODAL KLIK LUAR ══
 ['modalTambah', 'modalEdit', 'modalDelete'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
         if (e.target === this) this.classList.add('hidden');
     });
+});
+
+// Intercept all subtask toggle form submissions for instant AJAX updates
+document.addEventListener('submit', function (e) {
+    if (e.target && e.target.action && e.target.action.includes('/subtasks/') && e.target.action.includes('/toggle')) {
+        e.preventDefault(); // Prevent full page reload!
+
+        const form = e.target;
+        const button = form.querySelector('button');
+        const spanText = form.closest('.flex').querySelector('span');
+
+        // Send AJAX request
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-HTTP-Method-Override': 'PATCH',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const isCompleted = data.is_completed;
+                if (!isCompleted) {
+                    // Turn to uncompleted
+                    button.style.backgroundColor = '#ffffff';
+                    button.style.borderColor = '#bfa38a';
+                    button.innerHTML = '';
+                    if (spanText) {
+                        spanText.style.color = '#4a270f';
+                        spanText.style.fontWeight = '600';
+                        spanText.style.textDecoration = 'none';
+                    }
+                } else {
+                    // Turn to completed
+                    button.style.backgroundColor = '#f97316';
+                    button.style.borderColor = '#f97316';
+                    button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    `;
+                    if (spanText) {
+                        spanText.style.color = '#9ca3af';
+                        spanText.style.fontWeight = '400';
+                        spanText.style.textDecoration = 'line-through';
+                    }
+                }
+            } else {
+                alert('Gagal memperbarui subtask.');
+            }
+        })
+        .catch(() => {
+            alert('Terjadi kesalahan jaringan.');
+        });
+    }
 });
 </script>
 @endsection

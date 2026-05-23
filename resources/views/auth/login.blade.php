@@ -30,7 +30,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" onsubmit="sessionStorage.setItem('tab_session_active', 'true');">
             @csrf
 
             {{-- Email --}}
@@ -60,8 +60,9 @@
             {{-- Remember Me --}}
             <div class="mb-6 flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                    <input type="checkbox" name="remember"
-                           class="rounded border-gray-300 text-orange-500 focus:ring-orange-400"/>
+                    <input type="checkbox" name="remember" value="1"
+                           class="rounded border-gray-300 text-orange-500 focus:ring-orange-400"
+                           {{ old('remember') ? 'checked' : '' }} />
                     Remember me
                 </label>
                 @if(Route::has('password.request'))

@@ -14,6 +14,14 @@ class SubtaskController extends Controller
             'is_completed' => !$subtask->is_completed,
         ]);
 
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_completed' => $subtask->is_completed,
+                'message' => 'Subtask diperbarui!'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Subtask diperbarui!');
     }
 

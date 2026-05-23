@@ -42,6 +42,8 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
+        session(['remember_me' => false]);
+
         return redirect()->route('kanban.index');
     }
 }

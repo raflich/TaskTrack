@@ -1,94 +1,150 @@
-<div class="bg-white rounded-xl p-4 shadow-sm cursor-grab active:cursor-grabbing"
+@php
+    $borderColor = match($task->status_task) {
+        'TODO'  => '#c026d3', // Fuchsia / Magenta
+        'DOING' => '#1d4ed8', // Biru agak tua
+        default => '#9ca3af', // Abu-abu
+    };
+
+    $priorityBg = match(true) {
+        $task->status_task !== 'DONE' && $task->prioritas === 'HIGH'   => '#ff3b30',
+        $task->status_task !== 'DONE' && $task->prioritas === 'MEDIUM' => '#a855f8',
+        $task->status_task !== 'DONE'                                  => '#f97316',
+        $task->prioritas === 'HIGH'   => '#fee2e2',
+        $task->prioritas === 'MEDIUM' => '#f3e8ff',
+        default                       => '#ffedd5',
+    };
+
+    $priorityColor = match(true) {
+        $task->status_task !== 'DONE' => '#ffffff',
+        $task->prioritas === 'HIGH'   => '#ef4444',
+        $task->prioritas === 'MEDIUM' => '#a855f8',
+        default                       => '#ea580c',
+    };
+@endphp
+
+<div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 cursor-grab active:cursor-grabbing task-card {{ $task->status_task === 'DONE' ? 'opacity-60' : '' }}"
+     style="padding: 20px; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;"
      data-task-id="{{ $task->id_task }}">
 
-    {{-- Header --}}
-    <div class="flex justify-between items-start mb-2">
-        <h3 class="font-semibold text-gray-800 text-sm leading-snug flex-1 pr-2">
-            {{ $task->judul_task }}
-        </h3>
-        <div class="flex gap-1 shrink-0">
-            {{-- Edit --}}
-            <button type="button"
-                    onclick="openEditModal('{{ $task->id_task }}')"
-                    class="text-gray-400 hover:text-orange-500 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
-                             m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-            </button>
-            {{-- Hapus → buka modal delete --}}
-            <button type="button"
-                    onclick="openDeleteModal('{{ $task->id_task }}')"
-                    class="text-gray-400 hover:text-red-500 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858
-                             L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-            </button>
+    {{-- Accent border left drawn as an absolute element to prevent curved border issues --}}
+    <div class="status-border" style="position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background-color: {{ $borderColor }}; z-index: 10;"></div>
+
+    <div>
+        {{-- Header --}}
+        <div class="flex justify-between items-center mb-3" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="font-bold text-[15px] leading-snug flex-1 pr-3 task-title"
+                style="color: {{ $task->status_task === 'DONE' ? '#9ca3af' : '#2d1e17' }};
+                       {{ $task->status_task === 'DONE' ? 'text-decoration: line-through;' : '' }}
+                       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                {{ $task->judul_task }}
+            </h3>
+            <div class="flex gap-2 shrink-0 items-center" style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+                <button type="button" onclick="openEditModal('{{ $task->id_task }}')"
+                        class="hover:opacity-75 transition-opacity duration-200"
+                        style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b4835f" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                </button>
+                <button type="button" onclick="openDeleteModal('{{ $task->id_task }}')"
+                        class="hover:opacity-75 transition-opacity duration-200"
+                        style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                </button>
+            </div>
         </div>
+
+        {{-- Deskripsi --}}
+        @if($task->deskripsi)
+            <p class="text-[13px] mb-4 line-clamp-2 leading-relaxed task-desc"
+               style="color: {{ $task->status_task === 'DONE' ? '#9ca3af' : '#7c6a5e' }};
+                      {{ $task->status_task === 'DONE' ? 'text-decoration: line-through;' : '' }}
+                      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                {{ $task->deskripsi }}
+            </p>
+        @endif
+
+        {{-- Subtasks --}}
+        @if($task->subtasks->count() > 0)
+            <div class="mb-4 flex flex-col gap-1.5 p-2.5 rounded-xl"
+                 style="background: #faf5f0; border: 1px solid #f0e6d3; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                @foreach($task->subtasks as $subtask)
+                    <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
+                        <form method="POST" action="{{ route('subtasks.toggle', $subtask->id_subtask) }}">
+                            @csrf @method('PATCH')
+                            <button type="submit"
+                                    class="rounded shrink-0 flex items-center justify-center transition-all"
+                                    style="width: 16px; height: 16px; border: 1.5px solid {{ $subtask->is_completed ? '#f97316' : '#bfa38a' }};
+                                           background: {{ $subtask->is_completed ? '#f97316' : '#ffffff' }}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;">
+                                @if($subtask->is_completed)
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                @endif
+                            </button>
+                        </form>
+                        <span class="text-[11px]"
+                              style="color: {{ $subtask->is_completed ? '#9ca3af' : '#4a270f' }};
+                                     font-weight: {{ $subtask->is_completed ? '400' : '600' }};
+                                     {{ $subtask->is_completed ? 'text-decoration: line-through;' : '' }}">
+                            {{ $subtask->nama_subtask }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 
-    {{-- Deskripsi --}}
-    @if($task->deskripsi)
-        <p class="text-gray-400 text-xs mb-3 line-clamp-2">{{ $task->deskripsi }}</p>
-    @endif
+    {{-- Footer --}}
+    <div class="flex items-center justify-between mt-auto pt-1" style="display: flex; justify-content: space-between; align-items: center;">
 
-    {{-- Subtasks --}}
-    @if($task->subtasks->count() > 0)
-        <div class="mb-3 flex flex-col gap-1">
-            @foreach($task->subtasks as $subtask)
-                <div class="flex items-center gap-2">
-                    <form method="POST" action="{{ route('subtasks.toggle', $subtask->id_subtask) }}">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                                class="w-4 h-4 rounded border shrink-0 flex items-center justify-center
-                                       {{ $subtask->is_completed
-                                          ? 'bg-orange-500 border-orange-500'
-                                          : 'border-gray-300' }}">
-                            @if($subtask->is_completed)
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white"
-                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          stroke-width="3" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            @endif
-                        </button>
-                    </form>
-                    <span class="text-xs {{ $subtask->is_completed
-                                            ? 'line-through text-gray-400'
-                                            : 'text-gray-600' }}">
-                        {{ $subtask->nama_subtask }}
-                    </span>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-    {{-- Footer: prioritas & deadline --}}
-    <div class="flex items-center justify-between mt-2">
-        <span class="text-xs text-white px-2 py-0.5 rounded-full font-medium
-                     {{ $task->prioritas === 'HIGH'
-                        ? 'bg-red-500'
-                        : ($task->prioritas === 'MEDIUM' ? 'bg-yellow-500' : 'bg-blue-400') }}">
+        {{-- Priority Badge — pill shape --}}
+        <span class="task-priority-badge text-[11px] font-bold tracking-wide"
+              style="background-color: {{ $priorityBg }};
+                     color: {{ $priorityColor }};
+                     padding: 4px 14px;
+                     border-radius: 9999px;
+                     line-height: 1;
+                     display: inline-block;
+                     text-align: center;
+                     text-transform: capitalize;
+                     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+              data-priority="{{ strtoupper($task->prioritas) }}">
             {{ ucfirst(strtolower($task->prioritas)) }}
         </span>
 
-        @if($task->tanggal_deadline)
-            <span class="text-xs flex items-center gap-1
-                         {{ $task->isOverdue() ? 'text-red-500 font-medium' : 'text-gray-400' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        {{-- Completed / Deadline --}}
+        <div class="due-date-wrapper flex items-center" style="display: flex; align-items: center;">
+
+            {{-- Completed Badge --}}
+            <span class="completed-badge text-[12px] font-medium flex items-center gap-1.5"
+                  style="color: #9ca3af; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; display: {{ $task->status_task === 'DONE' ? 'flex' : 'none' }}; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                Completed
+            </span>
+
+            {{-- Deadline --}}
+            @if($task->tanggal_deadline)
+            <span class="date-badge text-[12px] font-medium flex items-center gap-1.5"
+                  style="color: {{ $task->isOverdue() ? '#ef4444' : '#7c6a5e' }}; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; display: {{ $task->status_task === 'DONE' ? 'none' : 'flex' }}; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c6a5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                 </svg>
                 {{ $task->tanggal_deadline->format('d M') }}
             </span>
-        @endif
+            @endif
+
+        </div>
     </div>
 
 </div>

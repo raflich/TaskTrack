@@ -6,6 +6,7 @@ use App\Http\Controllers\SubtaskController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\ListViewController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SearchController;
 
 
 // Redirect root ke kanban
@@ -40,6 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/trash', [TrashController::class, 'emptyTrash'])->name('trash.empty');
 
     // List View
-Route::get('/list', [ListViewController::class, 'index'])->name('listview.index');
+    Route::get('/list', [ListViewController::class, 'index'])->name('listview.index');
+
+    // Global Search
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
 
 });

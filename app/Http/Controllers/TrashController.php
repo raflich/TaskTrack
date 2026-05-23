@@ -10,7 +10,13 @@ class TrashController extends Controller
 {
     public function index()
     {
-        $board        = Auth::user()->board;
+        $board = Auth::user()->board;
+
+        // Otomatis hapus permanen task di trash yang sudah lebih dari 7 hari
+        $board->trashedTasks()
+              ->where('deleted_at', '<=', now()->subDays(7))
+              ->delete();
+
         $trashedTasks = $board->trashedTasks()->with('subtasks')->get();
 
         return view('trash.index', compact('trashedTasks'));

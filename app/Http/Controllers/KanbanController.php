@@ -11,7 +11,7 @@ class KanbanController extends Controller
     {
         $board = Auth::user()->board;
 
-        $tasks = $board->tasks()->with('subtasks')->get();
+        $tasks = $board->tasks()->with('subtasks')->orderBy('created_at', 'asc')->get();
 
         $todo  = $tasks->where('status_task', 'TODO');
         $doing = $tasks->where('status_task', 'DOING');

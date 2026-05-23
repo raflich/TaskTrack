@@ -1,39 +1,127 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reset Password - TaskTrack</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="min-h-screen bg-[#fdf6ee] flex flex-col items-center justify-center p-4">
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <!-- Header / Logo -->
+    <div class="mb-6 text-center">
+        <div class="flex justify-center mb-3">
+            <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
         </div>
+        <h1 class="text-3xl font-bold text-[#4a270f]">TaskTrack</h1>
+        <p class="text-xs text-gray-500 mt-1.5 max-w-[280px] mx-auto leading-relaxed">
+            Your streamlined workspace for personal momentum and professional accomplishment.
+        </p>
+    </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    <!-- Card Container -->
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-[#4a270f]/5 border border-[#faf6f0] p-8">
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+        <h2 class="text-xl font-bold text-[#4a270f] mb-2">Reset Password</h2>
+        <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+            Enter your new credentials below to regain access to your personal dashboard.
+        </p>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
+        <!-- Session Status -->
+        @if(session('status'))
+            <div class="mb-4 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-xl text-xs">
+                {{ session('status') }}
+            </div>
+        @endif
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+        <!-- Errors -->
+        @if($errors->any())
+            <div class="mb-4 px-4 py-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+        <form method="POST" action="{{ route('password.store') }}">
+            @csrf
+
+            <!-- Password Reset Token -->
+            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+            <!-- Email Address -->
+            <div class="mb-4">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                    Email Address
+                </label>
+                <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">
+                    <span class="text-gray-400 mr-3 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#bfa38a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </span>
+                    <input type="email" name="email" value="{{ old('email', $request->email) }}"
+                           placeholder="alex@example.com"
+                           class="bg-transparent py-3 w-full text-sm text-gray-800 border-0 focus:ring-0 shadow-none outline-none placeholder-gray-300"
+                           required autofocus />
+                </div>
+            </div>
+
+            <!-- New Password -->
+            <div class="mb-4">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                    New Password
+                </label>
+                <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">
+                    <span class="text-gray-400 mr-3 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#bfa38a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </span>
+                    <input type="password" name="password"
+                           placeholder="••••••••"
+                           class="bg-transparent py-3 w-full text-sm text-gray-800 border-0 focus:ring-0 shadow-none outline-none placeholder-gray-300"
+                           required autocomplete="new-password" />
+                </div>
+            </div>
+
+            <!-- Confirm New Password -->
+            <div class="mb-6">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                    Confirm New Password
+                </label>
+                <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">
+                    <span class="text-gray-400 mr-3 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#bfa38a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </span>
+                    <input type="password" name="password_confirmation"
+                           placeholder="••••••••"
+                           class="bg-transparent py-3 w-full text-sm text-gray-800 border-0 focus:ring-0 shadow-none outline-none placeholder-gray-300"
+                           required autocomplete="new-password" />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold
+                           py-3 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-orange-500/20 active:scale-[0.99]">
+                Reset Password
+            </button>
+
+            <!-- Back to Login Link -->
+            <div class="text-center mt-6">
+                <a href="{{ route('login') }}"
+                   class="text-xs font-semibold text-gray-400 hover:text-orange-500 transition-colors duration-200">
+                    Back to Login
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>

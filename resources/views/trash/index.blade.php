@@ -15,7 +15,7 @@
 
     <div class="flex flex-col gap-3">
         @forelse($trashedTasks as $task)
-            <div class="bg-white rounded-xl px-5 py-4 flex items-center justify-between shadow-sm">
+            <div class="trash-item bg-white rounded-xl px-5 py-4 flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="w-1 h-10 rounded-full shrink-0
                                 {{ $task->prioritas === 'HIGH'
@@ -23,7 +23,7 @@
                                    : ($task->prioritas === 'MEDIUM' ? 'bg-yellow-500' : 'bg-blue-400') }}">
                     </div>
                     <div>
-                        <p class="font-semibold text-gray-800 text-sm">{{ $task->judul_task }}</p>
+                        <p class="trash-title font-semibold text-gray-800 text-sm">{{ $task->judul_task }}</p>
                         <p class="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor">
