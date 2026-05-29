@@ -2,32 +2,32 @@
 
 @section('content')
 <div class="p-6">
-    <h1 class="text-xl font-bold text-gray-800 mb-1">Trash</h1>
-    <p class="text-sm text-gray-400 mb-6">
+    <h1 style="font-size: 28px; font-weight: 800; color: #2d1e17; margin: 0 0 4px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Trash</h1>
+    <p style="font-size: 14px; color: #a08878; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
         Tasks here will be permanently deleted after 7 days.
     </p>
 
     @if(session('success'))
-        <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm">
+        <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             {{ session('success') }}
         </div>
     @endif
 
     <div class="flex flex-col gap-3">
         @forelse($trashedTasks as $task)
-            <div class="trash-item bg-white rounded-xl px-5 py-4 flex items-center justify-between shadow-sm">
+            <div class="trash-item bg-white rounded-xl px-5 py-4 flex items-center justify-between shadow-sm" style="border: 1.5px solid #eee6da;">
                 <div class="flex items-center gap-3">
                     <div class="w-1 h-10 rounded-full shrink-0
                                 {{ $task->prioritas === 'HIGH'
                                    ? 'bg-red-500'
-                                   : ($task->prioritas === 'MEDIUM' ? 'bg-yellow-500' : 'bg-blue-400') }}">
+                                   : ($task->prioritas === 'MEDIUM' ? 'bg-purple-500' : 'bg-orange-400') }}">
                     </div>
                     <div>
-                        <p class="trash-title font-semibold text-gray-800 text-sm">{{ $task->judul_task }}</p>
-                        <p class="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
-                                 viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <p class="trash-title" style="color: #2d1e17; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 15px; font-weight: 600; margin: 0;">{{ $task->judul_task }}</p>
+                        <p style="font-size: 12px; color: #a08878; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; display: flex; align-items: center; gap: 4px; margin: 2px 0 0 0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px; color: #a08878;" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Deleted {{ $task->deleted_at?->diffForHumans() }}
@@ -38,21 +38,25 @@
                 <div class="flex gap-2 shrink-0">
                     {{-- Restore --}}
                     <button onclick="openRestoreModal('{{ $task->id_task }}')"
-                            class="flex items-center gap-1 bg-orange-500 hover:bg-orange-600
-                                   text-white text-xs px-3 py-1.5 rounded-lg transition">
+                            class="transition"
+                            style="background-color: #f97316; color: #ffffff; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer;"
+                            onmouseover="this.style.backgroundColor='#ea580c'"
+                            onmouseout="this.style.backgroundColor='#f97316'">
                         Restore
                     </button>
                     {{-- Hard Delete --}}
                     <button onclick="openHardDeleteModal('{{ $task->id_task }}')"
-                            class="flex items-center gap-1 bg-red-500 hover:bg-red-600
-                                   text-white text-xs px-3 py-1.5 rounded-lg transition">
+                            class="transition"
+                            style="background-color: #ef4444; color: #ffffff; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer;"
+                            onmouseover="this.style.backgroundColor='#dc2626'"
+                            onmouseout="this.style.backgroundColor='#ef4444'">
                         Delete Permanently
                     </button>
                 </div>
             </div>
         @empty
-            <div class="text-center py-16 text-gray-400">
-                <p class="text-sm">Trash kosong.</p>
+            <div class="text-center py-16" style="color: #bfa38a; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                <p style="font-size: 14px; margin: 0;">Trash kosong.</p>
             </div>
         @endforelse
     </div>
@@ -61,8 +65,10 @@
     @if($trashedTasks->count() > 0)
         <div class="mt-6 flex justify-center">
             <button onclick="openEmptyTrashModal()"
-                    class="flex items-center gap-2 border border-red-400 text-red-500
-                           hover:bg-red-50 text-sm px-5 py-2 rounded-lg transition">
+                    class="transition"
+                    style="background: none; border: 1.5px solid #ef4444; color: #ef4444; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 8px 20px; border-radius: 8px; cursor: pointer;"
+                    onmouseover="this.style.backgroundColor='#fef2f2'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                 Empty Trash Now
             </button>
         </div>
@@ -73,7 +79,7 @@
 {{-- MODAL RESTORE --}}
 {{-- ══════════════════════════════════════ --}}
 <div id="modalRestore" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
 
         {{-- Icon --}}
         <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -85,8 +91,8 @@
             </svg>
         </div>
 
-        <h2 class="text-lg font-bold text-gray-800 mb-2">Restore Task?</h2>
-        <p class="text-sm text-gray-400 mb-6">
+        <h2 style="font-size: 18px; font-weight: 700; color: #2d1e17; margin: 0 0 8px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Restore Task?</h2>
+        <p style="font-size: 14px; color: #8c7462; line-height: 1.5; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             Are you sure you want to restore this task?<br/>
             The task will be moved back to your active tasks.
         </p>
@@ -95,14 +101,17 @@
             @csrf
             @method('PATCH')
             <button type="submit"
-                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold
-                           py-2.5 rounded-xl text-sm transition mb-3">
+                    style="width: 100%; padding: 10px 0; background-color: #f97316; color: #ffffff; font-size: 14px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; margin-bottom: 12px;"
+                    onmouseover="this.style.backgroundColor='#ea580c'"
+                    onmouseout="this.style.backgroundColor='#f97316'">
                 Restore
             </button>
         </form>
 
         <button onclick="closeRestoreModal()"
-                class="text-sm text-gray-400 hover:text-gray-600 transition">
+                style="background: none; border: none; color: #8c7462; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                onmouseover="this.style.color='#5a4a3a'"
+                onmouseout="this.style.color='#8c7462'">
             Cancel
         </button>
     </div>
@@ -112,7 +121,7 @@
 {{-- MODAL HARD DELETE --}}
 {{-- ══════════════════════════════════════ --}}
 <div id="modalHardDelete" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
 
         {{-- Icon --}}
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -124,8 +133,8 @@
             </svg>
         </div>
 
-        <h2 class="text-lg font-bold text-gray-800 mb-2">Delete Permanently?</h2>
-        <p class="text-sm text-gray-400 mb-6">
+        <h2 style="font-size: 18px; font-weight: 700; color: #2d1e17; margin: 0 0 8px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Delete Permanently?</h2>
+        <p style="font-size: 14px; color: #8c7462; line-height: 1.5; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             This action cannot be undone. The task<br/>
             will be permanently removed forever.
         </p>
@@ -134,14 +143,17 @@
             @csrf
             @method('DELETE')
             <button type="submit"
-                    class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold
-                           py-2.5 rounded-xl text-sm transition mb-3">
+                    style="width: 100%; padding: 10px 0; background-color: #ef4444; color: #ffffff; font-size: 14px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; margin-bottom: 12px;"
+                    onmouseover="this.style.backgroundColor='#dc2626'"
+                    onmouseout="this.style.backgroundColor='#ef4444'">
                 Delete Permanently
             </button>
         </form>
 
         <button onclick="closeHardDeleteModal()"
-                class="text-sm text-gray-400 hover:text-gray-600 transition">
+                style="background: none; border: none; color: #8c7462; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                onmouseover="this.style.color='#5a4a3a'"
+                onmouseout="this.style.color='#8c7462'">
             Cancel
         </button>
     </div>
@@ -151,7 +163,7 @@
 {{-- MODAL EMPTY TRASH --}}
 {{-- ══════════════════════════════════════ --}}
 <div id="modalEmptyTrash" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
 
         {{-- Icon --}}
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -163,8 +175,8 @@
             </svg>
         </div>
 
-        <h2 class="text-lg font-bold text-gray-800 mb-2">Empty Trash?</h2>
-        <p class="text-sm text-gray-400 mb-6">
+        <h2 style="font-size: 18px; font-weight: 700; color: #2d1e17; margin: 0 0 8px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Empty Trash?</h2>
+        <p style="font-size: 14px; color: #8c7462; line-height: 1.5; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             This will permanently delete all tasks<br/>
             in trash. This action cannot be undone.
         </p>
@@ -173,14 +185,17 @@
             @csrf
             @method('DELETE')
             <button type="submit"
-                    class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold
-                           py-2.5 rounded-xl text-sm transition mb-3">
+                    style="width: 100%; padding: 10px 0; background-color: #ef4444; color: #ffffff; font-size: 14px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; margin-bottom: 12px;"
+                    onmouseover="this.style.backgroundColor='#dc2626'"
+                    onmouseout="this.style.backgroundColor='#ef4444'">
                 Empty Trash Now
             </button>
         </form>
 
         <button onclick="closeEmptyTrashModal()"
-                class="text-sm text-gray-400 hover:text-gray-600 transition">
+                style="background: none; border: none; color: #8c7462; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                onmouseover="this.style.color='#5a4a3a'"
+                onmouseout="this.style.color='#8c7462'">
             Cancel
         </button>
     </div>

@@ -7,10 +7,15 @@
     <title>TaskTrack</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            font-family: 'Poppins', sans-serif !important;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#fdf6ee] text-[#4a270f] antialiased h-screen overflow-hidden flex flex-col" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+<body class="bg-[#fdf6ee] text-[#4a270f] antialiased h-screen overflow-hidden flex flex-col" style="font-family: 'Poppins', sans-serif;">
 
     {{-- NAVBAR --}}
     @include('layouts.partials.navbar')
@@ -107,6 +112,67 @@
             if (tableFooter) tableFooter.classList.remove('hidden');
             if (searchNoHint) searchNoHint.classList.add('hidden');
         }
+    });
+    </script>
+
+    {{-- MODAL LOGOUT CONFIRMATION --}}
+    <div id="modalLogout" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center px-4 transition-opacity duration-200" style="z-index: 9999;">
+        <div id="logoutCard" class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center relative transition-all duration-200 transform scale-95 opacity-0">
+            
+            <!-- Circle Exit Icon -->
+            <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+            </div>
+
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Logout Account?</h2>
+            
+            <p class="text-sm text-gray-400 mb-6">
+                Are you sure you want to log out?<br>You'll need to sign in again to continue.
+            </p>
+
+            <!-- Form and Action Buttons -->
+            <form method="POST" action="{{ route('logout') }}" style="width: 100%;">
+                @csrf
+                <button type="submit" 
+                        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl text-sm transition mb-3">
+                    Logout
+                </button>
+            </form>
+            
+            <button onclick="closeLogoutModal()" 
+                    class="text-sm text-gray-400 hover:text-gray-600 transition">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function openLogoutModal() {
+        const modal = document.getElementById('modalLogout');
+        const card = document.getElementById('logoutCard');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            card.classList.remove('scale-95', 'opacity-0');
+            card.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeLogoutModal() {
+        const modal = document.getElementById('modalLogout');
+        const card = document.getElementById('logoutCard');
+        card.classList.remove('scale-100', 'opacity-100');
+        card.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    }
+
+    document.getElementById('modalLogout').addEventListener('click', function(e) {
+        if (e.target === this) closeLogoutModal();
     });
     </script>
 

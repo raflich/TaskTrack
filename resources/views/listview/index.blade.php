@@ -5,8 +5,14 @@
     .task-row {
         transition: background 0.15s ease;
     }
-    .task-row:hover {
+    .task-row:hover:not(.overdue-row) {
         background-color: #faf5f0;
+    }
+    .overdue-row {
+        background-color: #fff1f2;
+    }
+    .overdue-row:hover {
+        background-color: #ffe4e6;
     }
     .task-row td:first-child {
         position: relative;
@@ -15,18 +21,18 @@
     .row-border {
         position: absolute;
         left: 0;
-        top: 0;
-        bottom: 0;
+        top: 10px;
+        bottom: 10px;
         width: 4px;
-        border-radius: 0 2px 2px 0;
+        border-radius: 2px;
     }
 </style>
 
 <div class="p-6">
 
     {{-- Header --}}
-    <h1 class="text-xl font-bold mb-1" style="color: #2d1e17; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">List View</h1>
-    <p class="text-sm text-gray-400 mb-6" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Manage your personal productivity across all workflows.</p>
+    <h1 style="font-size: 28px; font-weight: 800; color: #2d1e17; margin: 0 0 4px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">List View</h1>
+    <p style="font-size: 14px; color: #a08878; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Manage your personal productivity across all workflows.</p>
 
     @if(session('success'))
         <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm">
@@ -35,54 +41,62 @@
     @endif
 
     {{-- Filter + Sort --}}
-    <div class="flex gap-3 mb-4 flex-wrap items-center">
+    <div class="flex gap-3 mb-5 flex-wrap items-center">
         <form method="GET" action="{{ route('listview.index') }}" class="flex gap-3">
-            <select name="status" onchange="this.form.submit()"
-                    class="rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 cursor-pointer"
-                    style="border: 1px solid #e8d8c8; background: #fff; color: #4a270f; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                <option value="all"   {{ !request('status') || request('status') === 'all' ? 'selected' : '' }}>Filter Status</option>
-                <option value="TODO"  {{ request('status') === 'TODO'  ? 'selected' : '' }}>To Do</option>
-                <option value="DOING" {{ request('status') === 'DOING' ? 'selected' : '' }}>Doing</option>
-                <option value="DONE"  {{ request('status') === 'DONE'  ? 'selected' : '' }}>Done</option>
-            </select>
+            <label style="position:relative; display:inline-flex; align-items:center;">
+                <select name="status" onchange="this.form.submit()"
+                        style="appearance:none; -webkit-appearance:none; border:1.5px solid #e8d8c8;
+                               border-radius:9999px; padding:8px 36px 8px 16px;
+                               font-size:13.5px; font-weight:600; cursor:pointer;
+                               background:#fff; color:#4a270f; outline:none;
+                               font-family:'Plus Jakarta Sans','Inter',sans-serif;">
+                    <option value="all"   {{ !request('status') || request('status') === 'all' ? 'selected' : '' }}>Filter: Status All</option>
+                    <option value="TODO"  {{ request('status') === 'TODO'  ? 'selected' : '' }}>Filter: To Do</option>
+                    <option value="DOING" {{ request('status') === 'DOING' ? 'selected' : '' }}>Filter: Doing</option>
+                    <option value="DONE"  {{ request('status') === 'DONE'  ? 'selected' : '' }}>Filter: Done</option>
+                </select>
+                <svg style="position:absolute;right:12px;pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c7462" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </label>
 
-            <select name="sort" onchange="this.form.submit()"
-                    class="rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 cursor-pointer"
-                    style="border: 1px solid #e8d8c8; background: #fff; color: #4a270f; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                <option value="due_date" {{ !request('sort') || request('sort') === 'due_date' ? 'selected' : '' }}>Sort: Due Date</option>
-                <option value="priority" {{ request('sort') === 'priority' ? 'selected' : '' }}>Sort: Priority</option>
-                <option value="title"    {{ request('sort') === 'title'    ? 'selected' : '' }}>Sort: Title</option>
-            </select>
+            <label style="position:relative; display:inline-flex; align-items:center;">
+                <select name="sort" onchange="this.form.submit()"
+                        style="appearance:none; -webkit-appearance:none; border:1.5px solid #e8d8c8;
+                               border-radius:9999px; padding:8px 36px 8px 16px;
+                               font-size:13.5px; font-weight:600; cursor:pointer;
+                               background:#fff; color:#4a270f; outline:none;
+                               font-family:'Plus Jakarta Sans','Inter',sans-serif;">
+                    <option value="due_date" {{ !request('sort') || request('sort') === 'due_date' ? 'selected' : '' }}>Sort: Due Date</option>
+                    <option value="priority" {{ request('sort') === 'priority' ? 'selected' : '' }}>Sort: Priority</option>
+                    <option value="title"    {{ request('sort') === 'title'    ? 'selected' : '' }}>Sort: Title</option>
+                </select>
+                <svg style="position:absolute;right:12px;pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c7462" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </label>
         </form>
     </div>
 
     {{-- Table --}}
-    <div class="rounded-2xl shadow-sm overflow-hidden" style="background: #fff;">
-        <table class="w-full text-sm" style="border-collapse: collapse;">
+    <div class="rounded-2xl overflow-hidden" style="background: #fff; border: 1.5px solid #eee6da; margin-top: 20px;">
+        <table class="w-full" style="border-collapse: collapse;">
             <thead>
-                <tr style="border-bottom: 1px solid #f0e6d3;">
-                    <th class="text-left py-3 font-semibold text-xs uppercase tracking-wider"
-                        style="padding-left: 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; width: 38%;">Task Title</th>
-                    <th class="text-left px-5 py-3 font-semibold text-xs uppercase tracking-wider"
-                        style="color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; width: 15%;">Due Date</th>
-                    <th class="text-left px-5 py-3 font-semibold text-xs uppercase tracking-wider"
-                        style="color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; width: 12%;">Priority</th>
-                    <th class="text-left px-5 py-3 font-semibold text-xs uppercase tracking-wider"
-                        style="color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; width: 15%;">Status</th>
-                    <th class="text-left px-5 py-3 font-semibold text-xs uppercase tracking-wider"
-                        style="color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; width: 20%;">Details</th>
+                <tr style="border-bottom: 1.5px solid #f0e6d3; background: #fdf8f3;">
+                    <th class="text-left" style="padding: 14px 16px 14px 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 700; width: 38%;">Task Title</th>
+                    <th class="text-left" style="padding: 14px 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 700; width: 15%;">Due Date</th>
+                    <th class="text-left" style="padding: 14px 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 700; width: 12%;">Priority</th>
+                    <th class="text-left" style="padding: 14px 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 700; width: 15%;">Status</th>
+                    <th class="text-left" style="padding: 14px 20px; color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; font-weight: 700; width: 20%;">Details</th>
                 </tr>
             </thead>
             <tbody id="taskTableBody">
                 @forelse($tasks as $task)
                     @php
-                        $borderColor = match($task->status_task) {
+                        $isDone    = $task->status_task === 'DONE';
+                        $isOverdue = $task->tanggal_deadline && $task->isOverdue() && !$isDone;
+
+                        $borderColor = $isOverdue ? '#ef4444' : match($task->status_task) {
                             'TODO'  => '#c026d3',
                             'DOING' => '#1d4ed8',
                             default => '#9ca3af',
                         };
-
-                        $isDone = $task->status_task === 'DONE';
 
                         $priorityBg = match(true) {
                             !$isDone && $task->prioritas === 'HIGH'   => '#ff3b30',
@@ -94,93 +108,97 @@
                         };
 
                         $priorityColor = match(true) {
-                            !$isDone              => '#ffffff',
+                            !$isDone                     => '#ffffff',
                             $task->prioritas === 'HIGH'   => '#ef4444',
                             $task->prioritas === 'MEDIUM' => '#a855f8',
-                            default               => '#ea580c',
+                            default                      => '#ea580c',
                         };
                     @endphp
 
-                    <tr class="task-row {{ $isDone ? 'opacity-60' : '' }}"
-                        style="border-bottom: 1px solid #faf0e6;">
+                    <tr class="task-row {{ $isDone ? 'opacity-60' : '' }} {{ $isOverdue ? 'overdue-row' : '' }}"
+                        style="border-bottom: 1.5px solid {{ $isOverdue ? '#fecdd3' : '#f5ede3' }};">
 
-                        {{-- Task Title with left border accent --}}
-                        <td style="padding: 14px 16px 14px 0; position: relative;">
+                        {{-- Task Title --}}
+                        <td style="padding: 18px 16px 18px 0; position: relative;">
                             <div class="row-border" style="background-color: {{ $borderColor }};"></div>
-                            <div class="flex items-center gap-3" style="padding-left: 16px;">
-                                <span class="task-title font-semibold"
+                            <div style="padding-left: 20px;">
+                                <span class="task-title"
                                       style="color: {{ $isDone ? '#9ca3af' : '#2d1e17' }};
                                              {{ $isDone ? 'text-decoration: line-through;' : '' }}
                                              font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-                                             font-size: 13.5px;">
+                                             font-size: 15px; font-weight: 600; display: block;">
                                     {{ $task->judul_task }}
                                 </span>
+                                @if($task->deskripsi)
+                                    <span style="font-size: 12px; color: {{ $isDone ? '#c4b5a8' : '#a08878' }};
+                                                 font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                                 display: block; margin-top: 2px;
+                                                 overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 320px;">
+                                        {{ $task->deskripsi }}
+                                    </span>
+                                @endif
                             </div>
-                            @if($task->deskripsi)
-                                <p class="text-xs mt-0.5 line-clamp-1"
-                                   style="padding-left: 16px; color: {{ $isDone ? '#c4b5a8' : '#a08878' }};
-                                          font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                                    {{ $task->deskripsi }}
-                                </p>
-                            @endif
                         </td>
 
                         {{-- Due Date --}}
-                        <td class="px-5" style="padding-top: 14px; padding-bottom: 14px;">
+                        <td style="padding: 18px 20px;">
                             @if($task->tanggal_deadline)
-                                <span class="flex items-center gap-1.5 text-xs"
-                                      style="color: {{ $task->isOverdue() && !$isDone ? '#ef4444' : '#7c6a5e' }};
-                                             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                         stroke="{{ $task->isOverdue() && !$isDone ? '#ef4444' : '#bfa38a' }}"
-                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                    </svg>
+                                <span style="display:flex; align-items:center; gap:6px;
+                                             color: {{ $isOverdue ? '#ef4444' : '#5a4a3a' }};
+                                             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                             font-size: 14px; font-weight: {{ $isOverdue ? '600' : '400' }};">
+                                    @if($isOverdue)
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <line x1="12" y1="8" x2="12" y2="12"/>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                        </svg>
+                                    @endif
                                     {{ $task->tanggal_deadline->format('M d, Y') }}
                                 </span>
                             @else
-                                <span class="text-xs" style="color: #c4b5a8; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">—</span>
+                                <span style="font-size:14px; color: #c4b5a8; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">—</span>
                             @endif
                         </td>
 
                         {{-- Priority --}}
-                        <td class="px-5" style="padding-top: 14px; padding-bottom: 14px;">
-                            <span class="text-[11px] font-bold tracking-wide"
-                                  style="background-color: {{ $priorityBg }};
+                        <td style="padding: 18px 20px;">
+                            <span style="background-color: {{ $priorityBg }};
                                          color: {{ $priorityColor }};
-                                         padding: 4px 12px;
+                                         padding: 5px 14px;
                                          border-radius: 9999px;
                                          font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                         font-size: 12px; font-weight: 700;
                                          display: inline-block;">
                                 {{ ucfirst(strtolower($task->prioritas)) }}
                             </span>
                         </td>
 
                         {{-- Status --}}
-                        <td class="px-5" style="padding-top: 14px; padding-bottom: 14px;">
+                        <td style="padding: 18px 20px;">
                             @if($task->status_task === 'TODO')
-                                <span class="flex items-center gap-1.5 text-xs font-semibold"
-                                      style="color: #c026d3; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2.2">
+                                <span style="display:flex; align-items:center; gap:6px;
+                                             color: #c026d3; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                             font-size: 14px; font-weight: 600;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2.2">
                                         <circle cx="12" cy="12" r="9"/>
                                     </svg>
                                     To Do
                                 </span>
                             @elseif($task->status_task === 'DOING')
-                                <span class="flex items-center gap-1.5 text-xs font-semibold"
-                                      style="color: #1d4ed8; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <span style="display:flex; align-items:center; gap:6px;
+                                             color: #1d4ed8; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                             font-size: 14px; font-weight: 600;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
                                     Doing
                                 </span>
                             @else
-                                <span class="flex items-center gap-1.5 text-xs font-semibold"
-                                      style="color: #9ca3af; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <span style="display:flex; align-items:center; gap:6px;
+                                             color: #9ca3af; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                                             font-size: 14px; font-weight: 600;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                         <polyline points="22 4 12 14.01 9 11.01"/>
                                     </svg>
@@ -190,17 +208,22 @@
                         </td>
 
                         {{-- Details & Actions --}}
-                        <td class="px-5" style="padding-top: 14px; padding-bottom: 14px;">
-                            <div class="flex items-center gap-3">
+                        <td style="padding: 18px 20px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
                                 <button type="button" onclick="openEditModal('{{ $task->id_task }}')"
-                                        class="text-xs font-semibold hover:underline transition"
-                                        style="background: none; border: none; padding: 0; cursor: pointer; color: #f97316; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                                        style="background:none; border:none; padding:0; cursor:pointer;
+                                               color:#f97316; font-family:'Plus Jakarta Sans','Inter',sans-serif;
+                                               font-size:14px; font-weight:600;"
+                                        onmouseover="this.style.textDecoration='underline'"
+                                        onmouseout="this.style.textDecoration='none'">
                                     Details ›
                                 </button>
                                 <button type="button" onclick="openDeleteModal('{{ $task->id_task }}')"
-                                        class="hover:opacity-70 transition-opacity"
-                                        style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                        style="background:none; border:none; padding:0; cursor:pointer;
+                                               display:flex; align-items:center; opacity:0.7;"
+                                        onmouseover="this.style.opacity='1'"
+                                        onmouseout="this.style.opacity='0.7'">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="3 6 5 6 21 6"/>
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                                         <line x1="10" y1="11" x2="10" y2="17"/>
@@ -229,28 +252,30 @@
         </table>
 
         {{-- Footer: total & pagination --}}
-        <div id="tableFooter" class="flex items-center justify-between px-5 py-3"
-             style="border-top: 1px solid #f0e6d3;">
-            <span class="text-xs" style="color: #bfa38a; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                Showing {{ $tasks->count() }} of {{ $tasks->total() }} tasks
+        <div id="tableFooter" style="display:flex; align-items:center; justify-content:space-between;
+                                    padding: 14px 20px; border-top: 1.5px solid #f0e6d3;">
+            <span style="font-size: 13px; color: #bfa38a; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+                Showing {{ $tasks->count() }} active tasks
             </span>
-            <div class="flex items-center gap-1 text-xs" style="color: #8c7462; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
+            <div style="display:flex; align-items:center; gap:4px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: 13px; color: #8c7462;">
                 @if($tasks->onFirstPage())
-                    <span class="px-2 py-1" style="color: #d1c4b8;">‹</span>
+                    <span style="padding: 4px 8px; color: #d1c4b8;">‹</span>
                 @else
                     <a href="{{ $tasks->previousPageUrl() }}"
-                       class="px-2 py-1 hover:text-orange-500 transition">‹</a>
+                       style="padding: 4px 8px; text-decoration:none; color:#8c7462;"
+                       onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#8c7462'">‹</a>
                 @endif
 
-                <span class="px-2 py-1 font-semibold" style="color: #f97316;">
+                <span style="padding: 4px 8px; font-weight: 600; color: #f97316;">
                     Page {{ $tasks->currentPage() }} of {{ $tasks->lastPage() }}
                 </span>
 
                 @if($tasks->hasMorePages())
                     <a href="{{ $tasks->nextPageUrl() }}"
-                       class="px-2 py-1 hover:text-orange-500 transition">›</a>
+                       style="padding: 4px 8px; text-decoration:none; color:#8c7462;"
+                       onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#8c7462'">›</a>
                 @else
-                    <span class="px-2 py-1" style="color: #d1c4b8;">›</span>
+                    <span style="padding: 4px 8px; color: #d1c4b8;">›</span>
                 @endif
             </div>
         </div>
@@ -370,6 +395,14 @@
 {{-- ══════════════════════════════════════ --}}
 <div id="modalEdit" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-2xl p-8 w-full max-w-xl shadow-xl">
+        <!-- Overdue Warning Banner -->
+        <div id="editOverdueBanner" class="hidden" style="background-color: #ef4444; color: #ffffff; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; margin: -2rem -2rem 1.5rem -2rem; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>THIS TASK IS PAST ITS DEADLINE</span>
+        </div>
+
         <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Task</h2>
         <form id="editForm" method="POST" action="">
             @csrf
@@ -382,9 +415,12 @@
             </div>
             <div class="flex gap-4 mb-4">
                 <div class="flex-1">
-                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
+                        <span id="editOverdueBadge" class="hidden" style="background-color: #ef4444; color: #ffffff; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; letter-spacing: 0.05em; line-height: 1.2;">Overdue</span>
+                    </div>
                     <input type="date" id="editDeadline" name="tanggal_deadline"
-                           class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                           class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"/>
                 </div>
                 <div class="flex-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Priority</label>
@@ -458,7 +494,18 @@ function openEditModal(taskId) {
     if (!task) return;
     document.getElementById('editForm').action     = `/tasks/${taskId}`;
     document.getElementById('editJudul').value     = task.judul_task;
-    document.getElementById('editDeadline').value  = task.tanggal_deadline ?? '';
+    
+    // Parse tanggal_deadline to YYYY-MM-DD
+    let deadlineVal = '';
+    if (task.tanggal_deadline) {
+        const match = task.tanggal_deadline.match(/^\d{4}-\d{2}-\d{2}/);
+        if (match) {
+            deadlineVal = match[0];
+        }
+    }
+    const deadlineInput = document.getElementById('editDeadline');
+    deadlineInput.value = deadlineVal;
+
     document.getElementById('editDeskripsi').value = task.deskripsi ?? '';
     document.querySelectorAll('.edit-priority').forEach(r => r.checked = r.value === task.prioritas);
     const subtaskList = document.getElementById('subtaskListEdit');
@@ -468,6 +515,42 @@ function openEditModal(taskId) {
     } else {
         subtaskList.appendChild(makeSubtaskRow(''));
     }
+
+    // Overdue check logic
+    const overdueBanner = document.getElementById('editOverdueBanner');
+    const overdueBadge = document.getElementById('editOverdueBadge');
+
+    function checkOverdue(dateStr) {
+        if (!dateStr || task.status_task === 'DONE') return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const parts = dateStr.split('-');
+        const deadlineDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        deadlineDate.setHours(0, 0, 0, 0);
+        return deadlineDate < today;
+    }
+
+    function updateOverdueUI(dateStr) {
+        const isOverdue = checkOverdue(dateStr);
+        if (isOverdue) {
+            overdueBanner.style.setProperty('display', 'flex', 'important');
+            overdueBadge.style.setProperty('display', 'inline-block', 'important');
+            deadlineInput.style.borderColor = '#ef4444';
+            deadlineInput.style.color = '#ef4444';
+        } else {
+            overdueBanner.style.setProperty('display', 'none', 'important');
+            overdueBadge.style.setProperty('display', 'none', 'important');
+            deadlineInput.style.borderColor = '';
+            deadlineInput.style.color = '';
+        }
+    }
+
+    updateOverdueUI(deadlineVal);
+
+    deadlineInput.oninput = function() {
+        updateOverdueUI(this.value);
+    };
+
     document.getElementById('modalEdit').classList.remove('hidden');
 }
 function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }

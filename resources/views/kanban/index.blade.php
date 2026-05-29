@@ -199,6 +199,14 @@
 {{-- ══════════════════════════════════════ --}}
 <div id="modalEdit" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-2xl p-8 w-full max-w-xl shadow-xl">
+        <!-- Overdue Warning Banner -->
+        <div id="editOverdueBanner" class="hidden" style="background-color: #ef4444; color: #ffffff; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; margin: -2rem -2rem 1.5rem -2rem; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>THIS TASK IS PAST ITS DEADLINE</span>
+        </div>
+
         <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Task</h2>
         <form id="editForm" method="POST" action="">
             @csrf
@@ -211,9 +219,12 @@
             </div>
             <div class="flex gap-4 mb-4">
                 <div class="flex-1">
-                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Due Date</label>
+                        <span id="editOverdueBadge" class="hidden" style="background-color: #ef4444; color: #ffffff; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; letter-spacing: 0.05em; line-height: 1.2;">Overdue</span>
+                    </div>
                     <input type="date" id="editDeadline" name="tanggal_deadline"
-                           class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                           class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"/>
                 </div>
                 <div class="flex-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Priority</label>
@@ -292,7 +303,18 @@ function openEditModal(taskId) {
     if (!task) return;
     document.getElementById('editForm').action     = `/tasks/${taskId}`;
     document.getElementById('editJudul').value     = task.judul_task;
-    document.getElementById('editDeadline').value  = task.tanggal_deadline ?? '';
+    
+    // Parse tanggal_deadline to YYYY-MM-DD
+    let deadlineVal = '';
+    if (task.tanggal_deadline) {
+        const match = task.tanggal_deadline.match(/^\d{4}-\d{2}-\d{2}/);
+        if (match) {
+            deadlineVal = match[0];
+        }
+    }
+    const deadlineInput = document.getElementById('editDeadline');
+    deadlineInput.value = deadlineVal;
+
     document.getElementById('editDeskripsi').value = task.deskripsi ?? '';
     document.querySelectorAll('.edit-priority').forEach(r => r.checked = r.value === task.prioritas);
     const subtaskList = document.getElementById('subtaskListEdit');
@@ -302,6 +324,42 @@ function openEditModal(taskId) {
     } else {
         subtaskList.appendChild(makeSubtaskRow(''));
     }
+
+    // Overdue check logic
+    const overdueBanner = document.getElementById('editOverdueBanner');
+    const overdueBadge = document.getElementById('editOverdueBadge');
+
+    function checkOverdue(dateStr) {
+        if (!dateStr || task.status_task === 'DONE') return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const parts = dateStr.split('-');
+        const deadlineDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        deadlineDate.setHours(0, 0, 0, 0);
+        return deadlineDate < today;
+    }
+
+    function updateOverdueUI(dateStr) {
+        const isOverdue = checkOverdue(dateStr);
+        if (isOverdue) {
+            overdueBanner.style.setProperty('display', 'flex', 'important');
+            overdueBadge.style.setProperty('display', 'inline-block', 'important');
+            deadlineInput.style.borderColor = '#ef4444';
+            deadlineInput.style.color = '#ef4444';
+        } else {
+            overdueBanner.style.setProperty('display', 'none', 'important');
+            overdueBadge.style.setProperty('display', 'none', 'important');
+            deadlineInput.style.borderColor = '';
+            deadlineInput.style.color = '';
+        }
+    }
+
+    updateOverdueUI(deadlineVal);
+
+    deadlineInput.oninput = function() {
+        updateOverdueUI(this.value);
+    };
+
     document.getElementById('modalEdit').classList.remove('hidden');
 }
 function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }

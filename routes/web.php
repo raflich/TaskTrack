@@ -9,10 +9,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
 
 
-// Redirect root ke kanban
+// Root: welcome untuk tamu, kanban untuk yang sudah login
 Route::get('/', function () {
-    return redirect()->route('kanban.index');
-});
+    if (auth()->check()) {
+        return redirect()->route('kanban.index');
+    }
+    return view('welcome');
+})->name('welcome');
 
 // Route auth (dari Breeze)
 require __DIR__.'/auth.php';

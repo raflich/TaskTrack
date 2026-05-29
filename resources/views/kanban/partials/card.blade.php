@@ -1,9 +1,13 @@
 @php
-    $borderColor = match($task->status_task) {
-        'TODO'  => '#c026d3', // Fuchsia / Magenta
-        'DOING' => '#1d4ed8', // Biru agak tua
-        default => '#9ca3af', // Abu-abu
-    };
+    $isOverdue = $task->tanggal_deadline && $task->isOverdue() && $task->status_task !== 'DONE';
+
+    $borderColor = $isOverdue
+        ? '#ef4444'
+        : match($task->status_task) {
+            'TODO'  => '#c026d3',
+            'DOING' => '#1d4ed8',
+            default => '#9ca3af',
+        };
 
     $priorityBg = match(true) {
         $task->status_task !== 'DONE' && $task->prioritas === 'HIGH'   => '#ff3b30',
@@ -104,20 +108,35 @@
     {{-- Footer --}}
     <div class="flex items-center justify-between mt-auto pt-1" style="display: flex; justify-content: space-between; align-items: center;">
 
-        {{-- Priority Badge — pill shape --}}
-        <span class="task-priority-badge text-[11px] font-bold tracking-wide"
-              style="background-color: {{ $priorityBg }};
-                     color: {{ $priorityColor }};
-                     padding: 4px 14px;
-                     border-radius: 9999px;
-                     line-height: 1;
-                     display: inline-block;
-                     text-align: center;
-                     text-transform: capitalize;
-                     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
-              data-priority="{{ strtoupper($task->prioritas) }}">
-            {{ ucfirst(strtolower($task->prioritas)) }}
-        </span>
+        {{-- Left: Priority + Overdue badges --}}
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+
+            {{-- Priority Badge --}}
+            <span class="task-priority-badge text-[11px] font-bold tracking-wide"
+                  style="background-color: {{ $priorityBg }};
+                         color: {{ $priorityColor }};
+                         padding: 4px 14px;
+                         border-radius: 9999px;
+                         line-height: 1;
+                         display: inline-block;
+                         text-align: center;
+                         text-transform: capitalize;
+                         font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                  data-priority="{{ strtoupper($task->prioritas) }}">
+                {{ ucfirst(strtolower($task->prioritas)) }}
+            </span>
+
+            {{-- Overdue Badge --}}
+            @if($isOverdue)
+            <span style="font-size:11px; font-weight:700; color:#ef4444;
+                         border:1.5px solid #ef4444; border-radius:9999px;
+                         padding:4px 12px; line-height:1; display:inline-block;
+                         font-family:'Plus Jakarta Sans','Inter',sans-serif;">
+                Overdue
+            </span>
+            @endif
+
+        </div>
 
         {{-- Completed / Deadline --}}
         <div class="due-date-wrapper flex items-center" style="display: flex; align-items: center;">
@@ -135,12 +154,22 @@
             {{-- Deadline --}}
             @if($task->tanggal_deadline)
             <span class="date-badge text-[12px] font-medium flex items-center gap-1.5"
-                  style="color: {{ $task->isOverdue() ? '#ef4444' : '#7c6a5e' }}; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; display: {{ $task->status_task === 'DONE' ? 'none' : 'flex' }}; align-items: center; gap: 6px;">
+                  style="color: {{ $isOverdue ? '#ef4444' : '#7c6a5e' }}; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; display: {{ $task->status_task === 'DONE' ? 'none' : 'flex' }}; align-items: center; gap: 6px;">
+                @if($isOverdue)
+                {{-- Warning / Exclamation icon --}}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                @else
+                {{-- Clock icon --}}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c6a5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                 </svg>
-                {{ $task->tanggal_deadline->format('d M') }}
+                @endif
+                {{ $task->tanggal_deadline->format('d M Y') }}
             </span>
             @endif
 
