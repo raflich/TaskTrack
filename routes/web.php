@@ -17,6 +17,16 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+// Route migrasi database otomatis lewat browser
+Route::get('/run-migration', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return 'Migration run successfully! <br><br> <a href="/">Go to Home</a>';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
 // Route auth (dari Breeze)
 require __DIR__.'/auth.php';
 
