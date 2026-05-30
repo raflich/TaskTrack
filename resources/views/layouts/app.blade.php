@@ -176,5 +176,17 @@
     });
     </script>
 
+    {{-- Force logout jika browser/tab ditutup dan login tanpa remember me --}}
+    @if(!session('remember_me'))
+        <form id="forced-logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+            @csrf
+        </form>
+        <script>
+            if (!sessionStorage.getItem('tab_session_active')) {
+                document.getElementById('forced-logout-form').submit();
+            }
+        </script>
+    @endif
+
 </body>
 </html>
