@@ -40,8 +40,12 @@ RUN npm install && npm run build
 RUN mkdir -p storage/framework/{sessions,views,caches} \
     && chmod -R 777 storage bootstrap/cache
 
+# Copy & configure entrypoint
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Expose port
 EXPOSE 80
 
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Run migrations then start supervisor
+CMD ["/entrypoint.sh"]
