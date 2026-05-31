@@ -601,6 +601,21 @@ document.addEventListener('submit', function (e) {
         .then(data => {
             if (data.success) {
                 const isCompleted = data.is_completed;
+
+                // Sync with local tasksData
+                const taskId = form.closest('.task-card')?.dataset.taskId;
+                const actionParts = form.action.split('/');
+                const subtaskId = actionParts[actionParts.length - 2];
+                if (taskId && subtaskId) {
+                    const taskObj = tasksData.find(t => String(t.id_task) === String(taskId));
+                    if (taskObj && taskObj.subtasks) {
+                        const sub = taskObj.subtasks.find(s => String(s.id_subtask) === String(subtaskId));
+                        if (sub) {
+                            sub.is_completed = isCompleted ? 1 : 0;
+                        }
+                    }
+                }
+
                 if (!isCompleted) {
                     // Turn to uncompleted
                     button.style.backgroundColor = '#ffffff';
