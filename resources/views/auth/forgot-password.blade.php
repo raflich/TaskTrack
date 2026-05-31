@@ -22,7 +22,7 @@
             </div>
         </div>
         <h1 class="text-3xl font-bold text-[#4a270f]">TaskTrack</h1>
-        <p class="text-xs text-gray-500 mt-1.5 max-w-[280px] mx-auto leading-relaxed">
+        <p class="text-xs text-gray-400 mt-1.5 max-w-[320px] mx-auto leading-relaxed">
             Your streamlined workspace for personal momentum and professional accomplishment.
         </p>
     </div>
@@ -54,7 +54,7 @@
 
             <!-- Email Address -->
             <div class="mb-6">
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
                     Email Address
                 </label>
                 <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">

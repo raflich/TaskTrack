@@ -10,26 +10,41 @@
     <style>*, *::before, *::after { font-family: 'Poppins', sans-serif !important; }</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-[#fdf6ee] flex items-center justify-center">
+<body class="min-h-screen bg-[#fdf6ee] flex flex-col items-center justify-center p-4">
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
-
-        {{-- Logo --}}
-        <div class="mb-6 text-center">
-            <h1 class="text-2xl font-bold text-orange-500">TaskTrack</h1>
-            <p class="text-sm text-gray-400 mt-1">Masuk ke akun kamu</p>
+    <!-- Header / Logo -->
+    <div class="mb-6 text-center">
+        <div class="flex justify-center mb-3">
+            <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
         </div>
+        <h1 class="text-3xl font-bold text-[#4a270f]">TaskTrack</h1>
+        <p class="text-xs text-gray-400 mt-1.5 max-w-[320px] mx-auto leading-relaxed">
+            Your streamlined workspace for personal momentum and professional accomplishment.
+        </p>
+    </div>
 
-        {{-- Session Status --}}
+    <!-- Card Container -->
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-[#4a270f]/5 border border-[#faf6f0] p-8">
+
+        <h2 class="text-xl font-bold text-[#4a270f] mb-2">Welcome Back</h2>
+        <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+            Login to your private task manager.
+        </p>
+
+        <!-- Session Status -->
         @if(session('status'))
-            <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm">
+            <div class="mb-4 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-xl text-xs">
                 {{ session('status') }}
             </div>
         @endif
 
-        {{-- Errors --}}
+        <!-- Errors -->
         @if($errors->any())
-            <div class="mb-4 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+            <div class="mb-4 px-4 py-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs">
                 {{ $errors->first() }}
             </div>
         @endif
@@ -37,63 +52,78 @@
         <form method="POST" action="{{ route('login') }}" onsubmit="sessionStorage.setItem('tab_session_active', 'true');">
             @csrf
 
-            {{-- Email --}}
-            <div class="mb-4">
-                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Email
+            <!-- Email Address -->
+            <div class="mb-6">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                    Email Address
                 </label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                       placeholder="email@example.com"
-                       class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
-                              focus:outline-none focus:ring-2 focus:ring-orange-400"
-                       required autofocus/>
+                <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">
+                    <span class="text-gray-400 mr-3 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#bfa38a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </span>
+                    <input type="email" name="email" value="{{ old('email') }}"
+                           placeholder="Cihuyy@example.com"
+                           class="bg-transparent py-3 w-full text-sm text-gray-800 placeholder-gray-300 font-medium"
+                           style="border: none !important; outline: none !important; box-shadow: none !important;"
+                           required autofocus />
+                </div>
             </div>
 
-            {{-- Password --}}
-            <div class="mb-4">
-                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <!-- Password -->
+            <div class="mb-6">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
                     Password
                 </label>
-                <input type="password" name="password"
-                       placeholder="••••••••"
-                       class="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
-                              focus:outline-none focus:ring-2 focus:ring-orange-400"
-                       required/>
+                <div class="flex items-center bg-[#faf5f0] border border-[#eedecc] rounded-xl px-4 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all duration-300">
+                    <span class="text-gray-400 mr-3 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#bfa38a]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </span>
+                    <input type="password" name="password"
+                           placeholder="••••••••"
+                           class="bg-transparent py-3 w-full text-sm text-gray-800 placeholder-gray-300 font-medium"
+                           style="border: none !important; outline: none !important; box-shadow: none !important;"
+                           required />
+                </div>
             </div>
 
-            {{-- Remember Me --}}
-            <div class="mb-6 flex items-center justify-between">
-                <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+            <!-- Remember Me & Forgot Password -->
+            <div class="mb-6 flex items-center justify-between mt-3">
+                <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer select-none">
                     <input type="checkbox" name="remember" value="1"
-                           class="rounded border-gray-300 text-orange-500 focus:ring-orange-400"
+                           class="rounded border-[#eedecc] text-orange-500 focus:ring-orange-400 focus:ring-offset-0 focus:ring-1"
                            {{ old('remember') ? 'checked' : '' }} />
                     Remember me
                 </label>
                 @if(Route::has('password.request'))
                     <a href="{{ route('password.request') }}"
-                       class="text-sm text-orange-500 hover:underline">
-                        Lupa password?
+                       class="text-xs font-semibold text-gray-400 hover:text-orange-500 transition-colors duration-200">
+                        Forgot Password?
                     </a>
                 @endif
             </div>
 
-            {{-- Submit --}}
+            <!-- Submit Button -->
             <button type="submit"
                     class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold
-                           py-2 rounded-lg text-sm transition">
-                Log In
+                           py-3 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-orange-500/20 active:scale-[0.99]">
+                Login
             </button>
 
-            {{-- Link ke Register --}}
-            <p class="text-center text-sm text-gray-400 mt-4">
-                Belum punya akun?
-                <a href="{{ route('register') }}"
-                   class="text-orange-500 font-semibold hover:underline">
-                    Register
-                </a>
-            </p>
-
         </form>
+    </div>
+
+    <!-- Register Link -->
+    <div class="text-center mt-6">
+        <p class="text-xs text-gray-400">
+            Don't have an account?
+            <a href="{{ route('register') }}" class="font-semibold text-[#4a270f] hover:text-orange-500 transition-colors duration-200">
+                Create an account
+            </a>
+        </p>
     </div>
 
 </body>
