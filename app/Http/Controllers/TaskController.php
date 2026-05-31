@@ -51,7 +51,7 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->route('kanban.index')->with('success', 'Task berhasil dibuat!');
+        return redirect()->back()->with('success', 'Task berhasil dibuat!');
     }
 
     // Update task
@@ -110,7 +110,7 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->route('kanban.index')->with('success', 'Task berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Task berhasil diperbarui!');
     }
 
     // Pindah status task
@@ -140,6 +140,6 @@ class TaskController extends Controller
             'deleted_at' => now(),
         ]);
 
-        return redirect()->route('kanban.index')->with('success', 'Task dipindahkan ke trash!');
+        return redirect()->back()->with('success', 'Task dipindahkan ke trash!');
     }
 }
