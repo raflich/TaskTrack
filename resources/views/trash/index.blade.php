@@ -56,7 +56,7 @@
             </div>
         @empty
             <div class="text-center py-16" style="color: #bfa38a; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
-                <p style="font-size: 14px; margin: 0;">Trash kosong.</p>
+                <p style="font-size: 14px; margin: 0;">Trash is empty.</p>
             </div>
         @endforelse
     </div>

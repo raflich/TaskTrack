@@ -117,7 +117,7 @@
 
     {{-- MODAL LOGOUT CONFIRMATION --}}
     <div id="modalLogout" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center px-4 transition-opacity duration-200" style="z-index: 9999;">
-        <div id="logoutCard" class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center relative transition-all duration-200 transform scale-95 opacity-0">
+        <div id="logoutCard" class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center relative transition-all duration-200 transform scale-95 opacity-0" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             
             <!-- Circle Exit Icon -->
             <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 flex-shrink-0">
@@ -128,9 +128,9 @@
                 </svg>
             </div>
 
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Logout Account?</h2>
+            <h2 style="font-size: 18px; font-weight: 700; color: #2d1e17; margin: 0 0 8px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Logout Account?</h2>
             
-            <p class="text-sm text-gray-400 mb-6">
+            <p style="font-size: 14px; color: #8c7462; line-height: 1.5; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
                 Are you sure you want to log out?<br>You'll need to sign in again to continue.
             </p>
 
@@ -138,13 +138,17 @@
             <form method="POST" action="{{ route('logout') }}" style="width: 100%;">
                 @csrf
                 <button type="submit" 
-                        class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl text-sm transition mb-3">
+                        style="width: 100%; padding: 10px 0; background-color: #f97316; color: #ffffff; font-size: 14px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; margin-bottom: 12px;"
+                        onmouseover="this.style.backgroundColor='#ea580c'"
+                        onmouseout="this.style.backgroundColor='#f97316'">
                     Logout
                 </button>
             </form>
             
             <button onclick="closeLogoutModal()" 
-                    class="text-sm text-gray-400 hover:text-gray-600 transition">
+                    style="background: none; border: none; color: #8c7462; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                    onmouseover="this.style.color='#5a4a3a'"
+                    onmouseout="this.style.color='#8c7462'">
                 Cancel
             </button>
         </div>

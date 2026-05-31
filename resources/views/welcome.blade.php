@@ -17,7 +17,7 @@
     {{-- ══ FAKE NAVBAR ══ --}}
     <nav style="height:73px; background:#fdf6ee; border-bottom:1px solid #eae0d5;
                 display:flex; align-items:center; justify-content:space-between;
-                padding:0 64px; flex-shrink:0; position:relative; z-index:10;">
+                padding-left:24px; padding-right:40px; flex-shrink:0; position:relative; z-index:10;">
         <span style="font-size:32px; font-weight:800; color:#7c4a24; letter-spacing:-0.025em;">TaskTrack</span>
         <div style="display:flex; align-items:center; gap:20px;">
             <button style="background:none;border:none;cursor:pointer;padding:6px;color:#8c7462;">

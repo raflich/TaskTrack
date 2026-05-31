@@ -100,7 +100,7 @@
 {{-- MODAL DELETE TASK --}}
 {{-- ══════════════════════════════════════ --}}
 <div id="modalDelete" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl text-center" style="font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor">
@@ -109,8 +109,8 @@
                          L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
         </div>
-        <h2 class="text-lg font-bold text-gray-800 mb-2">Delete Task?</h2>
-        <p class="text-sm text-gray-400 mb-6">
+        <h2 style="font-size: 18px; font-weight: 700; color: #2d1e17; margin: 0 0 8px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">Delete Task?</h2>
+        <p style="font-size: 14px; color: #8c7462; line-height: 1.5; margin: 0 0 24px; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;">
             Are you sure you want to delete this task?<br/>
             This action will move it to the Trash.
         </p>
@@ -118,13 +118,16 @@
             @csrf
             @method('DELETE')
             <button type="submit"
-                    class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold
-                           py-2.5 rounded-xl text-sm transition mb-3">
+                    style="width: 100%; padding: 10px 0; background-color: #ef4444; color: #ffffff; font-size: 14px; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: background-color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; margin-bottom: 12px;"
+                    onmouseover="this.style.backgroundColor='#dc2626'"
+                    onmouseout="this.style.backgroundColor='#ef4444'">
                 Move to Trash
             </button>
         </form>
         <button onclick="closeDeleteModal()"
-                class="text-sm text-gray-400 hover:text-gray-600 transition">
+                style="background: none; border: none; color: #8c7462; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.2s; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;"
+                onmouseover="this.style.color='#5a4a3a'"
+                onmouseout="this.style.color='#8c7462'">
             Cancel
         </button>
     </div>

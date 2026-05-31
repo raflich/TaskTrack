@@ -1,5 +1,5 @@
 <nav class="flex items-center justify-between bg-[#fdf6ee] border-b border-[#eae0d5] shrink-0 h-[73px] z-50"
-     style="display: flex; align-items: center; justify-content: space-between; padding-left: 64px; padding-right: 64px;">
+     style="display: flex; align-items: center; justify-content: space-between; padding-left: 24px; padding-right: 40px;">
 
     <!-- Brand Title -->
     <a href="{{ route('kanban.index') }}" class="hover:opacity-85 transition-opacity"
