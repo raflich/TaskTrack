@@ -51,7 +51,7 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Task berhasil dibuat!');
+        return redirect()->back()->with('success', 'Task successfully created!');
     }
 
     // Update task
@@ -110,7 +110,7 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Task berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Task successfully updated!');
     }
 
     // Pindah status task
@@ -128,7 +128,7 @@ class TaskController extends Controller
         return response()->json(['success' => true]);
     }
 
-    return redirect()->route('kanban.index')->with('success', 'Status diperbarui!');
+    return redirect()->back()->with('success', 'Status successfully updated!');
     }
 
     // Soft delete task
@@ -140,6 +140,6 @@ class TaskController extends Controller
             'deleted_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Task dipindahkan ke trash!');
+        return redirect()->back()->with('success', 'Task successfully moved to Trash!');
     }
 }

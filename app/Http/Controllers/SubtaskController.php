@@ -18,11 +18,11 @@ class SubtaskController extends Controller
             return response()->json([
                 'success' => true,
                 'is_completed' => $subtask->is_completed,
-                'message' => 'Subtask diperbarui!'
+                'message' => 'Subtask updated!'
             ]);
         }
 
-        return redirect()->back()->with('success', 'Subtask diperbarui!');
+        return redirect()->back()->with('success', 'Subtask updated!');
     }
 
     public function destroy($id)
@@ -30,6 +30,6 @@ class SubtaskController extends Controller
         $subtask = Subtask::findOrFail($id);
         $subtask->delete();
 
-        return redirect()->back()->with('success', 'Subtask berhasil dihapus!');
+        return redirect()->back()->with('success', 'Subtask successfully deleted!');
     }
 }

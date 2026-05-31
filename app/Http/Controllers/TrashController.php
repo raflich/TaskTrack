@@ -30,7 +30,7 @@ class TrashController extends Controller
             'deleted_at' => null,
         ]);
 
-        return redirect()->route('trash.index')->with('success', 'Task berhasil direstore!');
+        return redirect()->route('trash.index')->with('success', 'Task successfully restored!');
     }
 
     public function hardDelete($id)
@@ -38,7 +38,7 @@ class TrashController extends Controller
         $task = Task::findOrFail($id);
         $task->delete();
 
-        return redirect()->route('trash.index')->with('success', 'Task berhasil dihapus permanen!');
+        return redirect()->route('trash.index')->with('success', 'Task permanently deleted!');
     }
 
     public function emptyTrash()
@@ -48,6 +48,6 @@ class TrashController extends Controller
             $task->delete();
         });
 
-        return redirect()->route('trash.index')->with('success', 'Trash berhasil dikosongkan!');
+        return redirect()->route('trash.index')->with('success', 'Trash successfully emptied!');
     }
 }
