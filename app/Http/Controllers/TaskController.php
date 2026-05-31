@@ -37,13 +37,15 @@ class TaskController extends Controller
             'tanggal_deadline' => $request->tanggal_deadline,
         ]);
 
-        // Simpan subtasks jika ada
+        // Simpan subtasks jika ada, dengan urutan sesuai posisi input
         if ($request->has('subtasks')) {
+            $urutan = 1;
             foreach ($request->subtasks as $nama) {
                 if (!empty(trim($nama))) {
                     Subtask::create([
                         'id_task'      => $task->id_task,
                         'nama_subtask' => trim($nama),
+                        'urutan'       => $urutan++,
                     ]);
                 }
             }
@@ -71,17 +73,40 @@ class TaskController extends Controller
             'tanggal_deadline' => $request->tanggal_deadline,
         ]);
 
-        // Hapus subtask lama, simpan yang baru
-        $task->subtasks()->delete();
+        // Sync subtasks: preserve is_completed for existing ones, assign urutan
+        $incomingIds   = collect($request->input('subtask_ids', []))->filter()->values();
+        $incomingNames = collect($request->input('subtask_names', []))->values();
 
-        if ($request->has('subtasks')) {
-            foreach ($request->subtasks as $nama) {
-                if (!empty(trim($nama))) {
-                    Subtask::create([
-                        'id_task'      => $task->id_task,
-                        'nama_subtask' => trim($nama),
-                    ]);
-                }
+        // Delete subtasks that are no longer in the list
+        if ($incomingIds->isNotEmpty()) {
+            $task->subtasks()->whereNotIn('id_subtask', $incomingIds->toArray())->delete();
+        } else {
+            $task->subtasks()->delete();
+        }
+
+        // Update existing subtasks: name + assign correct urutan (1-based position)
+        $urutan = 1;
+        foreach ($incomingIds as $index => $subtaskId) {
+            $nama = $incomingNames->get($index, '');
+            if (!empty(trim($nama))) {
+                Subtask::where('id_subtask', $subtaskId)
+                       ->where('id_task', $task->id_task)
+                       ->update([
+                           'nama_subtask' => trim($nama),
+                           'urutan'       => $urutan++,
+                       ]);
+            }
+        }
+
+        // Add brand-new subtasks — continue urutan from where existing left off
+        $newNames = collect($request->input('new_subtasks', []));
+        foreach ($newNames as $nama) {
+            if (!empty(trim($nama))) {
+                Subtask::create([
+                    'id_task'      => $task->id_task,
+                    'nama_subtask' => trim($nama),
+                    'urutan'       => $urutan++,
+                ]);
             }
         }
 

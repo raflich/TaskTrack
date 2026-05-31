@@ -15,6 +15,7 @@ class Subtask extends Model
         'id_subtask',
         'id_task',
         'nama_subtask',
+        'urutan',
         'is_completed',
     ];
 

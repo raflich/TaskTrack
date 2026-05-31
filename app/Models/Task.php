@@ -39,7 +39,8 @@ class Task extends Model
 
     public function subtasks()
     {
-        return $this->hasMany(Subtask::class, 'id_task', 'id_task');
+        return $this->hasMany(Subtask::class, 'id_task', 'id_task')
+                    ->orderBy('urutan', 'asc');
     }
 
     public function board()

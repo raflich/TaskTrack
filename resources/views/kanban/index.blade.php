@@ -245,7 +245,10 @@
             </div>
             <div class="mb-6">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Subtasks</label>
+                {{-- Existing subtasks (with toggleable checkbox) --}}
                 <div id="subtaskListEdit" class="flex flex-col gap-2 mt-2"></div>
+                {{-- New subtasks added during this edit session --}}
+                <div id="newSubtaskListEdit" class="flex flex-col gap-1 mt-1"></div>
                 <button type="button" onclick="addSubtaskEdit()"
                         class="mt-2 text-orange-500 text-sm flex items-center gap-1 hover:underline">
                     + Add Subtask
@@ -319,10 +322,9 @@ function openEditModal(taskId) {
     document.querySelectorAll('.edit-priority').forEach(r => r.checked = r.value === task.prioritas);
     const subtaskList = document.getElementById('subtaskListEdit');
     subtaskList.innerHTML = '';
+    document.getElementById('newSubtaskListEdit').innerHTML = '';
     if (task.subtasks && task.subtasks.length > 0) {
-        task.subtasks.forEach(sub => subtaskList.appendChild(makeSubtaskRow(sub.nama_subtask)));
-    } else {
-        subtaskList.appendChild(makeSubtaskRow(''));
+        task.subtasks.forEach(sub => subtaskList.appendChild(makeExistingSubtaskRow(sub)));
     }
 
     // Overdue check logic
@@ -363,17 +365,113 @@ function openEditModal(taskId) {
     document.getElementById('modalEdit').classList.remove('hidden');
 }
 function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }
-function makeSubtaskRow(value = '') {
+
+// Build a row for an EXISTING subtask (has ID, toggleable checkbox)
+function makeExistingSubtaskRow(sub) {
     const div = document.createElement('div');
-    div.className = 'flex items-center gap-2';
+    div.className = 'flex items-center gap-2 subtask-existing-row';
+    div.dataset.subtaskId = sub.id_subtask;
+
+    const isCompleted = !!sub.is_completed;
+    const btnBg     = isCompleted ? '#f97316' : '#ffffff';
+    const btnBorder = isCompleted ? '#f97316' : '#bfa38a';
+    const checkSvg  = isCompleted
+        ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+        : '';
+    const nameColor = isCompleted ? '#9ca3af' : '#1f2937';
+    const nameDeco  = isCompleted ? 'line-through' : 'none';
+
     div.innerHTML = `
-        <div class="w-4 h-4 border border-gray-300 rounded shrink-0"></div>
-        <input type="text" name="subtasks[]" value="${value}" placeholder="Add a subtask..."
-               class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+        <input type="hidden" name="subtask_ids[]" value="${sub.id_subtask}"/>
+        <input type="hidden" name="subtask_names[]" value="${sub.nama_subtask}" class="subtask-name-val"/>
+        <button type="button"
+                onclick="toggleSubtaskEdit(this, '${sub.id_subtask}')"
+                class="subtask-toggle-btn rounded shrink-0 flex items-center justify-center transition-all"
+                data-completed="${isCompleted ? '1' : '0'}"
+                style="width:18px;height:18px;border:1.5px solid ${btnBorder};background:${btnBg};display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;border-radius:4px;flex-shrink:0;">
+            ${checkSvg}
+        </button>
+        <input type="text"
+               value="${sub.nama_subtask}"
+               oninput="this.closest('.subtask-existing-row').querySelector('.subtask-name-val').value = this.value"
+               class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+               style="color:${nameColor};text-decoration:${nameDeco};"
+               placeholder="Subtask name..."/>
+        <button type="button" onclick="removeEditSubtask(this)"
+                style="background:none;border:none;cursor:pointer;padding:2px;color:#d1d5db;" class="hover:text-red-400 transition shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     `;
     return div;
 }
-function addSubtaskEdit() { document.getElementById('subtaskListEdit').appendChild(makeSubtaskRow('')); }
+
+// Build a row for a NEW subtask (no ID yet)
+function makeNewSubtaskRow() {
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2';
+    div.innerHTML = `
+        <div style="width:18px;height:18px;border:1.5px solid #d1d5db;border-radius:4px;flex-shrink:0;"></div>
+        <input type="text" name="new_subtasks[]" placeholder="Add a subtask..."
+               class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+        <button type="button" onclick="this.closest('div.flex').remove()"
+                style="background:none;border:none;cursor:pointer;padding:2px;color:#d1d5db;" class="hover:text-red-400 transition shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    `;
+    return div;
+}
+
+function addSubtaskEdit() {
+    document.getElementById('newSubtaskListEdit').appendChild(makeNewSubtaskRow());
+}
+
+function removeEditSubtask(btn) {
+    const row = btn.closest('.subtask-existing-row');
+    row.querySelectorAll('input[type="hidden"]').forEach(el => el.remove());
+    row.remove();
+}
+
+function toggleSubtaskEdit(btn, subtaskId) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch(`/subtasks/${subtaskId}/toggle`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'X-HTTP-Method-Override': 'PATCH',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success) { alert('Gagal memperbarui subtask.'); return; }
+        const isCompleted = data.is_completed;
+        btn.setAttribute('data-completed', isCompleted ? '1' : '0');
+        const row = btn.closest('.subtask-existing-row');
+        const nameInput = row.querySelector('input[type="text"]');
+
+        // Also update tasksData so re-opening modal reflects new state
+        const taskId = document.getElementById('editForm').action.split('/').pop();
+        const taskObj = tasksData.find(t => String(t.id_task) === String(taskId));
+        if (taskObj && taskObj.subtasks) {
+            const sub = taskObj.subtasks.find(s => String(s.id_subtask) === String(subtaskId));
+            if (sub) sub.is_completed = isCompleted ? 1 : 0;
+        }
+
+        if (isCompleted) {
+            btn.style.backgroundColor = '#f97316';
+            btn.style.borderColor     = '#f97316';
+            btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+            if (nameInput) { nameInput.style.color = '#9ca3af'; nameInput.style.textDecoration = 'line-through'; }
+        } else {
+            btn.style.backgroundColor = '#ffffff';
+            btn.style.borderColor     = '#bfa38a';
+            btn.innerHTML = '';
+            if (nameInput) { nameInput.style.color = '#1f2937'; nameInput.style.textDecoration = 'none'; }
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan jaringan.'));
+}
 
 // ══ DRAG AND DROP ══
 document.querySelectorAll('.kanban-col').forEach(col => {

@@ -65,28 +65,61 @@
             {{-- Subtasks --}}
             <div class="mb-6">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Subtasks</label>
-                <div id="subtaskList" class="flex flex-col gap-2 mt-2">
-                    @forelse($task->subtasks as $subtask)
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 border border-gray-300 rounded shrink-0"></div>
-                            <input type="text" name="subtasks[]"
+
+                {{-- Existing subtasks with toggleable checkbox --}}
+                <div id="existingSubtaskList" class="flex flex-col gap-2 mt-2">
+                    @foreach($task->subtasks as $subtask)
+                        <div class="flex items-center gap-2 subtask-existing-row" data-subtask-id="{{ $subtask->id_subtask }}">
+                            {{-- Hidden fields to pass id & name on form submit --}}
+                            <input type="hidden" name="subtask_ids[]" value="{{ $subtask->id_subtask }}"/>
+                            <input type="hidden" name="subtask_names[]" value="{{ $subtask->nama_subtask }}" class="subtask-name-val"/>
+
+                            {{-- AJAX Toggle Checkbox --}}
+                            <button type="button"
+                                    onclick="toggleSubtask(this, '{{ $subtask->id_subtask }}')"
+                                    class="subtask-toggle-btn rounded shrink-0 flex items-center justify-center transition-all"
+                                    data-completed="{{ $subtask->is_completed ? '1' : '0' }}"
+                                    style="width: 18px; height: 18px;
+                                           border: 1.5px solid {{ $subtask->is_completed ? '#f97316' : '#bfa38a' }};
+                                           background: {{ $subtask->is_completed ? '#f97316' : '#ffffff' }};
+                                           display: flex; align-items: center; justify-content: center;
+                                           padding: 0; cursor: pointer; border-radius: 4px; flex-shrink: 0;">
+                                @if($subtask->is_completed)
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                @endif
+                            </button>
+
+                            {{-- Editable name --}}
+                            <input type="text"
                                    value="{{ $subtask->nama_subtask }}"
-                                   class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                                   oninput="this.closest('.subtask-existing-row').querySelector('.subtask-name-val').value = this.value"
+                                   class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                   style="color: {{ $subtask->is_completed ? '#9ca3af' : '#1f2937' }};
+                                          text-decoration: {{ $subtask->is_completed ? 'line-through' : 'none' }};"
+                                   placeholder="Subtask name..."/>
+
+                            {{-- Remove row button --}}
+                            <button type="button" onclick="removeExistingSubtask(this, '{{ $subtask->id_subtask }}')"
+                                    class="text-gray-300 hover:text-red-400 transition shrink-0" style="background:none;border:none;cursor:pointer;padding:2px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
                         </div>
-                    @empty
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 border border-gray-300 rounded shrink-0"></div>
-                            <input type="text" name="subtasks[]"
-                                   placeholder="Add a subtask..."
-                                   class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
-                <button type="button" onclick="addSubtask()"
+
+                {{-- New subtasks (no ID yet) --}}
+                <div id="newSubtaskList" class="flex flex-col gap-2 mt-1"></div>
+
+                <button type="button" onclick="addNewSubtask()"
                         class="mt-2 text-orange-500 text-sm flex items-center gap-1 hover:underline">
                     + Add Subtask
                 </button>
             </div>
+
+            {{-- Deleted existing subtask IDs (to remove from hidden list) - managed by JS --}}
+            <div id="deletedSubtaskContainer"></div>
 
             {{-- Actions --}}
             <div class="flex justify-end gap-3">
@@ -104,33 +137,79 @@
 </div>
 
 <script>
-function addSubtask() {
-    const list = document.getElementById('subtaskList');
+// ── Toggle existing subtask via AJAX ──────────────────────────────
+function toggleSubtask(btn, subtaskId) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch(`/subtasks/${subtaskId}/toggle`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'X-HTTP-Method-Override': 'PATCH',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success) { alert('Gagal memperbarui subtask.'); return; }
+        const isCompleted = data.is_completed;
+        btn.setAttribute('data-completed', isCompleted ? '1' : '0');
+        const row = btn.closest('.subtask-existing-row');
+        const nameInput = row.querySelector('input[type="text"]');
+
+        if (isCompleted) {
+            btn.style.backgroundColor = '#f97316';
+            btn.style.borderColor     = '#f97316';
+            btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+            if (nameInput) { nameInput.style.color = '#9ca3af'; nameInput.style.textDecoration = 'line-through'; }
+        } else {
+            btn.style.backgroundColor = '#ffffff';
+            btn.style.borderColor     = '#bfa38a';
+            btn.innerHTML = '';
+            if (nameInput) { nameInput.style.color = '#1f2937'; nameInput.style.textDecoration = 'none'; }
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan jaringan.'));
+}
+
+// ── Remove existing subtask row (removes from form, won't be sent) ──
+function removeExistingSubtask(btn, subtaskId) {
+    const row = btn.closest('.subtask-existing-row');
+    // Remove the hidden inputs so they aren't submitted
+    row.querySelectorAll('input[type="hidden"]').forEach(el => el.remove());
+    row.remove();
+}
+
+// ── Add a new subtask row ─────────────────────────────────────────
+function addNewSubtask() {
+    const list = document.getElementById('newSubtaskList');
     const div  = document.createElement('div');
     div.className = 'flex items-center gap-2';
     div.innerHTML = `
-        <div class="w-4 h-4 border border-gray-300 rounded shrink-0"></div>
-        <input type="text" name="subtasks[]" placeholder="Add a subtask..."
+        <div style="width:18px;height:18px;border:1.5px solid #d1d5db;border-radius:4px;flex-shrink:0;"></div>
+        <input type="text" name="new_subtasks[]" placeholder="Add a subtask..."
                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+        <button type="button" onclick="this.closest('div.flex').remove()"
+                class="text-gray-300 hover:text-red-400 transition" style="background:none;border:none;cursor:pointer;padding:2px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     `;
     list.appendChild(div);
 }
 
-// Live overdue check
+// ── Live overdue check ────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
     const deadlineInput = document.getElementById('editDeadline');
     const overdueBanner = document.getElementById('editOverdueBanner');
-    const overdueBadge = document.getElementById('editOverdueBadge');
-    const statusTask = @json($task->status_task);
+    const overdueBadge  = document.getElementById('editOverdueBadge');
+    const statusTask    = @json($task->status_task);
 
     function checkOverdue(dateStr) {
         if (!dateStr || statusTask === 'DONE') return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(); today.setHours(0,0,0,0);
         const parts = dateStr.split('-');
-        const deadlineDate = new Date(parts[0], parts[1] - 1, parts[2]);
-        deadlineDate.setHours(0, 0, 0, 0);
-        return deadlineDate < today;
+        const dl = new Date(parts[0], parts[1]-1, parts[2]); dl.setHours(0,0,0,0);
+        return dl < today;
     }
 
     function updateOverdueUI(dateStr) {
@@ -149,9 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (deadlineInput) {
-        deadlineInput.addEventListener('input', function() {
-            updateOverdueUI(this.value);
-        });
+        deadlineInput.addEventListener('input', function() { updateOverdueUI(this.value); });
     }
 });
 </script>
